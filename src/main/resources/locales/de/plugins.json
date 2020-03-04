@@ -1,0 +1,34 @@
+{
+  "scm-teamscale-plugin": {
+    "config": {
+      "link": "Teamscale",
+      "title": "Teamscale",
+      "form": {
+        "url": "URL",
+        "url-helptext": "Die URL des Teamscale Projekts.",
+        "username": "Benutzername",
+        "username-helptext": "Der Teamscale Benutzername",
+        "password": "Passwort",
+        "password-helptext": "Das Teamscale Passwort"
+      }
+    }
+  },
+  "permissions": {
+    "repository": {
+      "teamscale": {
+        "*": {
+          "displayName": "Repository-spezifische Teamscale Konfiguration ändern",
+          "description": "Darf die repository-spezifische Teamscale Konfiguration verändern"
+        }
+      }
+    }
+  },
+  "verbs": {
+    "repository": {
+      "redmine": {
+        "displayName": "Teamscale Konfiguration ändern",
+        "description": "Darf die Teamscale Konfiguration verändern"
+      }
+    }
+  }
+}

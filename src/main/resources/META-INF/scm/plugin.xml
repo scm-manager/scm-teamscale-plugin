@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE plugin SYSTEM "https://download.scm-manager.org/dtd/plugin/2.0.0-01.dtd">
+<plugin>
+  <scm-version>2</scm-version>
+
+  <information>
+    <displayName>Teamscale</displayName>
+    <author>Cloudogu GmbH</author>
+    <category>Continuous Integration</category>
+  </information>
+
+  <conditions>
+    <min-version>${project.parent.version}</min-version>
+  </conditions>
+
+  <resources>
+    <script>assets/scm-teamscale-plugin.bundle.js</script>
+  </resources>
+
+</plugin>

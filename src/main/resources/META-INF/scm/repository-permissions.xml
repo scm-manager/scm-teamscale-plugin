@@ -1,0 +1,5 @@
+<repository-permissions>
+  <verbs>
+    <verb>teamscale</verb>
+  </verbs>
+</repository-permissions>

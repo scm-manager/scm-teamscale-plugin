@@ -1,0 +1,34 @@
+{
+  "scm-teamscale-plugin": {
+    "config": {
+      "link": "Teamscale",
+      "title": "Teamscale",
+      "form": {
+        "url": "URL",
+        "url-helptext": "URL of Teamscale project.",
+        "username": "Username",
+        "username-helptext": "The Teamscale user name",
+        "password": "Password",
+        "password-helptext": "The Teamscale password"
+      }
+    }
+  },
+  "permissions": {
+    "repository": {
+      "teamscale": {
+        "*": {
+          "displayName": "Modify repository specific Teamscale configuration",
+          "description": "May modify the repository specific Teamscale configuration for all repositories"
+        }
+      }
+    }
+  },
+  "verbs": {
+    "repository": {
+      "teamscale": {
+        "displayName": "Configure Teamscale",
+        "description": "May modify the repository specific Teamscale configuration"
+      }
+    }
+  }
+}
