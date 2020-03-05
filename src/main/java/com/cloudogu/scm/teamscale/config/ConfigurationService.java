@@ -1,6 +1,7 @@
 package com.cloudogu.scm.teamscale.config;
 
 import com.cloudogu.scm.teamscale.Constants;
+import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.repository.NamespaceAndName;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryManager;
@@ -27,22 +28,25 @@ public class ConfigurationService {
   public ConfigurationDto getConfiguration(String namespace, String name) {
     Repository repository = loadRepository(namespace, name);
     RepositoryPermissions.custom(Constants.NAME, repository).check();
-    Configuration configuration = getRepositoryConfigurationOrEmpty(repository);
+    Configuration configuration = configStore.getConfiguration(repository);
     return mapper.map(configuration, repository);
   }
 
   public void updateConfig(String namespace, String name, ConfigurationDto updatedConfig) {
     Repository repository = loadRepository(namespace, name);
     RepositoryPermissions.custom(Constants.NAME, repository).check();
-    configStore.storeConfiguration(mapper.map(updatedConfig, getRepositoryConfigurationOrEmpty(repository)), repository);
+    configStore.storeConfiguration(mapper.map(updatedConfig, configStore.getConfiguration(repository)), repository);
   }
 
-  private Configuration getRepositoryConfigurationOrEmpty(Repository repository) {
-    Configuration configuration = configStore.getConfiguration(repository);
-    if (configuration == null) {
-      return new Configuration();
-    }
-    return configuration;
+  public GlobalConfigurationDto getGlobalConfiguration() {
+    ConfigurationPermissions.read(Constants.NAME).check();
+    GlobalConfiguration globalConfiguration = configStore.getGlobalConfiguration();
+    return mapper.map(globalConfiguration);
+  }
+
+  public void updateGlobalConfiguration(GlobalConfigurationDto updatedGlobalConfiguration) {
+    ConfigurationPermissions.write(Constants.NAME).check();
+    configStore.storeGlobalConfiguration(mapper.map(updatedGlobalConfiguration, configStore.getGlobalConfiguration()));
   }
 
   private Repository loadRepository(String namespace, String name) {

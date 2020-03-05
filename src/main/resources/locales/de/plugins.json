@@ -25,7 +25,7 @@
   },
   "verbs": {
     "repository": {
-      "redmine": {
+      "teamscale": {
         "displayName": "Teamscale Konfiguration ändern",
         "description": "Darf die Teamscale Konfiguration verändern"
       }

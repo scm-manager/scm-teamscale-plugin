@@ -1,5 +1,6 @@
 import { ConfigurationBinder as cfgBinder } from "@scm-manager/ui-components";
 import TeamscaleRepositoryConfiguration from "./TeamscaleRepositoryConfiguration";
+import TeamscaleGlobalConfiguration from "./TeamscaleGlobalConfiguration";
 
 cfgBinder.bindRepositorySetting(
   "/teamscale",
@@ -7,3 +8,5 @@ cfgBinder.bindRepositorySetting(
   "teamscaleConfig",
   TeamscaleRepositoryConfiguration
 );
+
+cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);

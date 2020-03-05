@@ -1,5 +1,8 @@
 <permissions>
   <permission>
+    <value>configuration:read,write:teamscale</value>
+  </permission>
+  <permission>
     <value>repository:teamscale:*</value>
   </permission>
 </permissions>

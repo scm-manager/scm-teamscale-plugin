@@ -5,3 +5,7 @@ export type TeamscaleConfiguration = {
   usernameTransformPattern: string;
   _links: Links;
 };
+
+export type TeamscaleGlobalConfiguration = TeamscaleConfiguration & {
+  disableRepositoryConfiguration: boolean;
+};

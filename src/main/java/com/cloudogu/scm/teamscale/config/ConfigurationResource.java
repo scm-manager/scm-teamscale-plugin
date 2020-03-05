@@ -1,5 +1,6 @@
 package com.cloudogu.scm.teamscale.config;
 
+import com.cloudogu.scm.teamscale.Constants;
 import com.google.inject.Inject;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import sonia.scm.api.v2.resources.ErrorDto;
+import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.web.VndMediaType;
 
 import javax.ws.rs.Consumes;
@@ -93,5 +95,61 @@ public class ConfigurationResource {
   )
   public Response getConfiguration(@PathParam("namespace") String namespace, @PathParam("name") String name) {
     return Response.ok(configurationService.getConfiguration(namespace, name)).build();
+  }
+
+  @PUT
+  @Path("/")
+  @Consumes({MediaType.APPLICATION_JSON})
+  @Operation(
+    summary = "Update global teamscale configuration",
+    description = "Modifies the global teamscale configuration.",
+    tags = "Redmine Plugin",
+    operationId = "teamscale_update_global_config"
+  )
+  @ApiResponse(responseCode = "200", description = "update success")
+  @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
+  @ApiResponse(responseCode = "403", description = "not authorized /  the current user does not have the right privilege")
+  @ApiResponse(
+    responseCode = "500",
+    description = "internal server error",
+    content = @Content(
+      mediaType = VndMediaType.ERROR_TYPE,
+      schema = @Schema(implementation = ErrorDto.class)
+    )
+  )
+  public Response updateGlobalConfiguration(GlobalConfigurationDto updatedConfig) {
+    configurationService.updateGlobalConfiguration(updatedConfig);
+    return Response.ok().build();
+  }
+
+  @GET
+  @Path("/")
+  @Produces({MediaType.APPLICATION_JSON})
+  @Operation(
+    summary = "Get global teamscale configuration",
+    description = "Returns the global teamscale configuration.",
+    tags = "Redmine Plugin",
+    operationId = "teamscale_get_global_config"
+  )
+  @ApiResponse(
+    responseCode = "200",
+    description = "success",
+    content = @Content(
+      mediaType = MediaType.APPLICATION_JSON,
+      schema = @Schema(implementation = ConfigurationDto.class)
+    )
+  )
+  @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
+  @ApiResponse(responseCode = "403", description = "not authorized /  the current user does not have the right privilege")
+  @ApiResponse(
+    responseCode = "500",
+    description = "internal server error",
+    content = @Content(
+      mediaType = VndMediaType.ERROR_TYPE,
+      schema = @Schema(implementation = ErrorDto.class)
+    )
+  )
+  public Response getGlobalConfiguration() {
+    return Response.ok(configurationService.getGlobalConfiguration()).build();
   }
 }

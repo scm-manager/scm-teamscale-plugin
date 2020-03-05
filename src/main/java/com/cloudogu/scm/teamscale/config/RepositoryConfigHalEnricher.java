@@ -19,16 +19,18 @@ import javax.inject.Provider;
 public class RepositoryConfigHalEnricher implements HalEnricher {
 
   private final Provider<ScmPathInfoStore> scmPathInfoStoreProvider;
+  private final ConfigStore configStore;
 
   @Inject
-  public RepositoryConfigHalEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider) {
+  public RepositoryConfigHalEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider, ConfigStore configStore) {
     this.scmPathInfoStoreProvider = scmPathInfoStoreProvider;
+    this.configStore = configStore;
   }
 
   @Override
   public void enrich(HalEnricherContext context, HalAppender appender) {
     Repository repository = context.oneRequireByType(Repository.class);
-    if (RepositoryPermissions.custom(Constants.NAME, repository).isPermitted()) {
+    if (!configStore.getGlobalConfiguration().isDisableRepositoryConfiguration() && RepositoryPermissions.custom(Constants.NAME, repository).isPermitted()) {
       String linkBuilder = new LinkBuilder(scmPathInfoStoreProvider.get().get(), ConfigurationResource.class)
         .method("getConfiguration")
         .parameters(repository.getNamespace(), repository.getName())

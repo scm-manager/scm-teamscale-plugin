@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 import sonia.scm.api.v2.resources.BaseMapper;
 import sonia.scm.api.v2.resources.LinkBuilder;
 import sonia.scm.api.v2.resources.ScmPathInfoStore;
+import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryPermissions;
 
@@ -32,9 +33,32 @@ public abstract class ConfigurationMapper extends BaseMapper {
 
   public abstract Configuration map(ConfigurationDto configurationDto, @Context Configuration oldConfiguration);
 
+  public abstract GlobalConfigurationDto map(GlobalConfiguration configuration);
+
+  public abstract GlobalConfiguration map(GlobalConfigurationDto configurationDto, @Context GlobalConfiguration oldConfiguration);
+
   @AfterMapping
   public void replacePasswordWithDummy(@MappingTarget ConfigurationDto target) {
     target.setPassword(DUMMY_PASSWORD);
+  }
+
+  @AfterMapping
+  public void addLinks(GlobalConfiguration source, @MappingTarget GlobalConfigurationDto target) {
+    Links.Builder linksBuilder = linkingTo().self(globalSelf());
+    if (ConfigurationPermissions.write(Constants.NAME).isPermitted()) {
+      linksBuilder.single(Link.link("update", globalUpdate()));
+    }
+    target.add(linksBuilder.build());
+  }
+
+  private String globalSelf() {
+    LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStore.get(), ConfigurationResource.class);
+    return linkBuilder.method("getGlobalConfiguration").parameters().href();
+  }
+
+  private String globalUpdate() {
+    LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStore.get(), ConfigurationResource.class);
+    return linkBuilder.method("updateGlobalConfiguration").parameters().href();
   }
 
   @AfterMapping

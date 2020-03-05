@@ -26,12 +26,23 @@ public class ConfigStore {
     createStore(repositoryId).set(configuration);
   }
 
+  public void storeGlobalConfiguration(GlobalConfiguration globalConfiguration) {
+    createGlobalStore().set(globalConfiguration);
+  }
+
   public Configuration getConfiguration(Repository repository) {
     return createStore(repository.getId()).getOptional().orElse(new Configuration());
+  }
+
+  public GlobalConfiguration getGlobalConfiguration() {
+    return createGlobalStore().getOptional().orElse(new GlobalConfiguration());
   }
 
   private ConfigurationStore<Configuration> createStore(String repositoryId) {
     return storeFactory.withType(Configuration.class).withName(NAME).forRepository(repositoryId).build();
   }
 
+  private ConfigurationStore<GlobalConfiguration> createGlobalStore() {
+    return storeFactory.withType(GlobalConfiguration.class).withName(NAME).build();
+  }
 }
