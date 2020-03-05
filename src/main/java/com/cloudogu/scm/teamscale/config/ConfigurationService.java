@@ -25,14 +25,14 @@ public class ConfigurationService {
     this.mapper = mapper;
   }
 
-  public ConfigurationDto getConfiguration(String namespace, String name) {
+  public ConfigurationDto getRepositoryConfiguration(String namespace, String name) {
     Repository repository = loadRepository(namespace, name);
     RepositoryPermissions.custom(Constants.NAME, repository).check();
     Configuration configuration = configStore.getConfiguration(repository);
     return mapper.map(configuration, repository);
   }
 
-  public void updateConfig(String namespace, String name, ConfigurationDto updatedConfig) {
+  public void updateRepositoryConfiguration(String namespace, String name, ConfigurationDto updatedConfig) {
     Repository repository = loadRepository(namespace, name);
     RepositoryPermissions.custom(Constants.NAME, repository).check();
     configStore.storeConfiguration(mapper.map(updatedConfig, configStore.getConfiguration(repository)), repository);

@@ -64,7 +64,7 @@ class ConfigurationServiceTest {
       Configuration emptyConfig = new Configuration();
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(emptyConfig);
       when(mapper.map(emptyConfig, REPOSITORY)).thenReturn(new ConfigurationDto("", "", ConfigurationMapper.DUMMY_PASSWORD));
-      ConfigurationDto configuration = service.getConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
+      ConfigurationDto configuration = service.getRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
       assertThat(configuration.getPassword()).isEqualTo(ConfigurationMapper.DUMMY_PASSWORD);
     }
 
@@ -73,7 +73,7 @@ class ConfigurationServiceTest {
       Configuration newConfig = new Configuration("hitchhiker.org", "trillian", "secret");
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(newConfig);
       when(mapper.map(newConfig, REPOSITORY)).thenReturn(new ConfigurationDto("hitchhiker.org", "trillian", "secret"));
-      ConfigurationDto configuration = service.getConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
+      ConfigurationDto configuration = service.getRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
       assertThat(configuration.getUrl()).isEqualTo(newConfig.getUrl());
       assertThat(configuration.getUsername()).isEqualTo(newConfig.getUsername());
       assertThat(configuration.getPassword()).isEqualTo(newConfig.getPassword());
@@ -82,14 +82,14 @@ class ConfigurationServiceTest {
     @Test
     void shouldThrowExceptionIfNotPermittedToGetConfig() {
       doThrow(AuthorizationException.class).when(subject).checkPermission(anyString());
-      assertThrows(AuthorizationException.class, () -> service.getConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName()));
+      assertThrows(AuthorizationException.class, () -> service.getRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName()));
     }
 
     @Test
     void shouldThrowExceptionIfNotPermittedToUpdateConfig() {
       ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org", "tricia", "trillian");
       doThrow(AuthorizationException.class).when(subject).checkPermission(anyString());
-      assertThrows(AuthorizationException.class, () -> service.updateConfig(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto));
+      assertThrows(AuthorizationException.class, () -> service.updateRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto));
     }
 
     @Test
@@ -98,14 +98,59 @@ class ConfigurationServiceTest {
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(oldConfig);
 
       ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org", "tricia", "trillian");
-      service.updateConfig(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto);
+      service.updateRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto);
 
       verify(mapper).map(newConfigDto, oldConfig);
     }
   }
 
   @Test
+  void shouldGetGlobalConfig() {
+    GlobalConfiguration newConfig = createGlobalConfiguration();
+    GlobalConfigurationDto globalConfigurationDto = createGlobalConfigurationDto();
+    when(configStore.getGlobalConfiguration()).thenReturn(newConfig);
+    when(mapper.map(newConfig)).thenReturn(globalConfigurationDto);
+    GlobalConfigurationDto configuration = service.getGlobalConfiguration();
+
+    assertThat(configuration.getUrl()).isEqualTo(newConfig.getUrl());
+    assertThat(configuration.getUsername()).isEqualTo(newConfig.getUsername());
+    assertThat(configuration.getPassword()).isEqualTo(newConfig.getPassword());
+    assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
+  }
+
+  @Test
+  void shouldUpdateGlobalConfig() {
+    GlobalConfiguration oldConfig = createGlobalConfiguration();
+    when(configStore.getGlobalConfiguration()).thenReturn(oldConfig);
+
+    GlobalConfigurationDto newConfigDto = createGlobalConfigurationDto();
+    service.updateGlobalConfiguration(newConfigDto);
+
+    verify(mapper).map(newConfigDto, oldConfig);
+  }
+
+  @Test
   void shouldThrowExceptionIfRepositoryNotFound() {
-    assertThrows(NotFoundException.class, () -> service.getConfiguration("not", "found"));
+    assertThrows(NotFoundException.class, () -> service.getRepositoryConfiguration("not", "found"));
+  }
+
+  private GlobalConfigurationDto createGlobalConfigurationDto() {
+    GlobalConfigurationDto configuration = new GlobalConfigurationDto();
+    configuration.setUsername("trillian");
+    configuration.setPassword("secret");
+    configuration.setUrl("");
+    configuration.setDisableRepositoryConfiguration(false);
+    return configuration;
+  }
+
+  private GlobalConfiguration createGlobalConfiguration() {
+    GlobalConfiguration configuration = new GlobalConfiguration();
+    configuration.setUrl("");
+    configuration.setUsername("trillian");
+    configuration.setPassword("secret");
+    configuration.setDisableRepositoryConfiguration(false);
+    return configuration;
   }
 }
+
+

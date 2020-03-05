@@ -16,12 +16,12 @@ import javax.inject.Provider;
 
 @Extension
 @Enrich(Index.class)
-public class TeamscaleIndexHalEnricher implements HalEnricher {
+public class IndexHalEnricher implements HalEnricher {
 
   private Provider<ScmPathInfoStore> scmPathInfoStoreProvider;
 
   @Inject
-  public TeamscaleIndexHalEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider) {
+  public IndexHalEnricher(Provider<ScmPathInfoStore> scmPathInfoStoreProvider) {
     this.scmPathInfoStoreProvider = scmPathInfoStoreProvider;
   }
 

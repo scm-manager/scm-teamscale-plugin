@@ -17,6 +17,8 @@ import sonia.scm.repository.Repository;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -104,6 +106,33 @@ class ConfigurationMapperTest {
   }
 
   @Test
+  void shouldMapGlobalConfigurationAttributesToDto() {
+    GlobalConfigurationDto dto = mapper.map(createGlobalConfiguration());
+    assertThat(dto.isDisableRepositoryConfiguration()).isFalse();
+  }
+
+  @Test
+  void shouldMapGlobalConfigurationAttributesFromDto() {
+    GlobalConfiguration configuration = mapper.map(createGlobalConfigurationDto(), createGlobalConfiguration());
+    assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
+  }
+
+  @Test
+  void shouldRestorePasswordAfterMappingFromGlobalDto() {
+    GlobalConfigurationDto dto = createGlobalConfigurationDto();
+    dto.setPassword(ConfigurationMapper.DUMMY_PASSWORD);
+
+    GlobalConfiguration configuration = mapper.map(dto, createGlobalConfiguration());
+    assertEquals("secret", configuration.getPassword());
+  }
+
+  @Test
+  void shouldReplacePasswordAfterMappingGlobalDto() {
+    GlobalConfigurationDto configuration = mapper.map(createGlobalConfiguration());
+    assertThat(ConfigurationMapper.DUMMY_PASSWORD).isEqualTo(configuration.getPassword());
+  }
+
+  @Test
   void shouldNotAddUpdateLinkToDtoIfNotPermitted() {
     ConfigurationDto dto = mapper.map(createConfiguration(), createRepository());
     assertThat(dto.getLinks().getLinkBy("update").isPresent()).isFalse();
@@ -120,6 +149,22 @@ class ConfigurationMapperTest {
     return new ConfigurationDto("heartofgo.ld",
       "trillian",
       "secret");
+  }
+
+  private GlobalConfiguration createGlobalConfiguration() {
+    GlobalConfiguration configuration = new GlobalConfiguration();
+    configuration.setUrl("");
+    configuration.setUsername("trillian");
+    configuration.setPassword("secret");
+    configuration.setDisableRepositoryConfiguration(false);
+    return configuration;
+  }
+
+  private GlobalConfigurationDto createGlobalConfigurationDto() {
+    GlobalConfigurationDto configuration = new GlobalConfigurationDto();
+    configuration.setUrl("");
+    configuration.setDisableRepositoryConfiguration(false);
+    return configuration;
   }
 
   private Repository createRepository() {

@@ -1,6 +1,5 @@
 package com.cloudogu.scm.teamscale.config;
 
-import com.cloudogu.scm.teamscale.Constants;
 import com.google.inject.Inject;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import sonia.scm.api.v2.resources.ErrorDto;
-import sonia.scm.config.ConfigurationPermissions;
 import sonia.scm.web.VndMediaType;
 
 import javax.ws.rs.Consumes;
@@ -55,7 +53,7 @@ public class ConfigurationResource {
     )
   )
   public Response updateConfiguration(@PathParam("namespace") String namespace, @PathParam("name") String name, ConfigurationDto updatedConfig) {
-    configurationService.updateConfig(namespace, name, updatedConfig);
+    configurationService.updateRepositoryConfiguration(namespace, name, updatedConfig);
     return Response.ok().build();
   }
 
@@ -94,7 +92,7 @@ public class ConfigurationResource {
     )
   )
   public Response getConfiguration(@PathParam("namespace") String namespace, @PathParam("name") String name) {
-    return Response.ok(configurationService.getConfiguration(namespace, name)).build();
+    return Response.ok(configurationService.getRepositoryConfiguration(namespace, name)).build();
   }
 
   @PUT

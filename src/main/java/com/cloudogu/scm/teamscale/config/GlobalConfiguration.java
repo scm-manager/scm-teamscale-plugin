@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class GlobalConfiguration extends Configuration {
   private boolean disableRepositoryConfiguration;
 
-  public GlobalConfiguration(String url, boolean disableRepositoryConfiguration, String username, String password) {
+  public GlobalConfiguration(String url, String username, String password, boolean disableRepositoryConfiguration) {
     super(url, username, password);
     this.disableRepositoryConfiguration = disableRepositoryConfiguration;
   }
