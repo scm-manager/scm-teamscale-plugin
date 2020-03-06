@@ -5,7 +5,7 @@
       "title": "Teamscale",
       "form": {
         "url": "URL",
-        "url-helptext": "URL of Teamscale project.",
+        "url-helptext": "URL of Teamscale instance.",
         "username": "Username",
         "username-helptext": "The Teamscale user name",
         "password": "Password",
