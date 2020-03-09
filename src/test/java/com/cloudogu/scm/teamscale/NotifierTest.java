@@ -15,6 +15,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sonia.scm.ConfigurationException;
 import sonia.scm.config.ScmConfiguration;
 import sonia.scm.net.ahc.AdvancedHttpClient;
 import sonia.scm.net.ahc.AdvancedHttpRequestWithBody;
@@ -26,7 +27,9 @@ import sonia.scm.repository.api.HookContext;
 import sonia.scm.repository.api.HookFeature;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,98 +67,127 @@ class NotifierTest {
   private Notifier notifier;
 
   @BeforeEach
-  void initConfigStore() {
-    when(configStore.getGlobalConfiguration()).thenReturn(createGlobalConfiguration());
-    when(configStore.getConfiguration(REPOSITORY)).thenReturn(createConfiguration());
-  }
-
-  @BeforeEach
   void initConfiguration() {
-    when(scmConfiguration.getBaseUrl()).thenReturn("http://www.scm-manager.org/scm");
+    lenient().when(scmConfiguration.getBaseUrl()).thenReturn("http://www.scm-manager.org/scm");
   }
 
   @BeforeEach
   void initHttpClient() {
-    when(httpClientProvider.get()).thenReturn(httpClient);
-    when(httpClient.post(any())).thenReturn(body);
-    when(body.jsonContent(jsonCaptor.capture())).thenReturn(body);
+    lenient().when(httpClientProvider.get()).thenReturn(httpClient);
+    lenient().when(httpClient.post(any())).thenReturn(body);
+    lenient().when(body.jsonContent(jsonCaptor.capture())).thenReturn(body);
   }
 
   @BeforeEach
   void initEvent() {
-    when(event.getRepository()).thenReturn(REPOSITORY);
-    when(event.getContext()).thenReturn(hookContext);
+    lenient().when(event.getRepository()).thenReturn(REPOSITORY);
+    lenient().when(event.getContext()).thenReturn(hookContext);
   }
 
   @Nested
-  class WithBranchProvider {
+  class withValidConfigurations {
 
     @BeforeEach
-    void initBranchProvider() {
-      when(hookContext.isFeatureSupported(HookFeature.BRANCH_PROVIDER)).thenReturn(true);
-      when(hookContext.getBranchProvider()).thenReturn(branchProvider);
+    void initConfigStore() {
+      when(configStore.getGlobalConfiguration()).thenReturn(createGlobalConfiguration(TEAMSCALE_INSTANCE_URL));
+      when(configStore.getConfiguration(REPOSITORY)).thenReturn(createConfiguration(TEAMSCALE_INSTANCE_URL));
+    }
+
+    @Nested
+    class WithBranchProvider {
+
+      @BeforeEach
+      void initBranchProvider() {
+        when(hookContext.isFeatureSupported(HookFeature.BRANCH_PROVIDER)).thenReturn(true);
+        when(hookContext.getBranchProvider()).thenReturn(branchProvider);
+      }
+
+      @Test
+      void shouldSendNotificationsForMultipleBranches() {
+        when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of("master", "develop", "feature/awesome"));
+
+        notifier.sendCommitNotification(event);
+
+        verify(httpClient, times(3)).post(TEAMSCALE_HOOK_URL);
+      }
+
+      @Test
+      void shouldSendNotificationWithRepositoryData() {
+        String branchName = "feature/awesome";
+        String nameSpaceAndName = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
+        when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of(branchName));
+
+        notifier.sendCommitNotification(event);
+
+        Notification jsonValue = jsonCaptor.getValue();
+        assertThat(jsonValue.getBranchName()).isEqualTo(branchName);
+        assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + nameSpaceAndName);
+        assertThat(jsonValue.getRepositoryId()).isEqualTo(nameSpaceAndName);
+      }
     }
 
     @Test
-    void shouldSendNotificationsForMultipleBranches() {
-      when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of("master", "develop", "feature/awesome"));
-
+    void shouldSendNotificationsWithoutBranchProvider() {
       notifier.sendCommitNotification(event);
 
-      verify(httpClient, times(3)).post(TEAMSCALE_HOOK_URL);
+      verify(httpClient).post(TEAMSCALE_HOOK_URL);
     }
 
     @Test
-    void shouldSendNotificationWithRepositoryData() {
-      String branchName = "feature/awesome";
+    void shouldSendNotificationWithoutBranchname() {
       String nameSpaceAndName = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
-      when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of(branchName));
 
       notifier.sendCommitNotification(event);
 
       Notification jsonValue = jsonCaptor.getValue();
-      assertThat(jsonValue.getBranchName()).isEqualTo(branchName);
       assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + nameSpaceAndName);
       assertThat(jsonValue.getRepositoryId()).isEqualTo(nameSpaceAndName);
     }
   }
 
   @Test
-  void shouldSendNotificationsWithoutBranchProvider() {
+  void shouldUseRepoConfigIfValid() {
+    when(configStore.getGlobalConfiguration()).thenReturn(createGlobalConfiguration(TEAMSCALE_INSTANCE_URL));
+    when(configStore.getConfiguration(REPOSITORY)).thenReturn(createConfiguration(TEAMSCALE_INSTANCE_URL));
+
     notifier.sendCommitNotification(event);
 
     verify(httpClient).post(TEAMSCALE_HOOK_URL);
   }
 
   @Test
-  void shouldSendNotificationWithoutBranchname() {
-    String nameSpaceAndName = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
+  void shouldUseGlobalConfigIfRepoConfigIsInvalid() {
+    String globalUrl = TEAMSCALE_INSTANCE_URL + "global";
+    when(configStore.getGlobalConfiguration()).thenReturn(createGlobalConfiguration(globalUrl));
+    when(configStore.getConfiguration(REPOSITORY)).thenReturn(createConfiguration(""));
 
     notifier.sendCommitNotification(event);
 
-    Notification jsonValue = jsonCaptor.getValue();
-    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + nameSpaceAndName);
-    assertThat(jsonValue.getRepositoryId()).isEqualTo(nameSpaceAndName);
+    verify(httpClient).post(globalUrl + "/scm-manager-hook");
   }
 
+  @Test
+  void shouldThrowConfigurationExceptionIfNoValidConfigExsits() {
+    when(configStore.getGlobalConfiguration()).thenReturn(createGlobalConfiguration(""));
+    when(configStore.getConfiguration(REPOSITORY)).thenReturn(createConfiguration(""));
 
+    assertThrows(ConfigurationException.class, () -> notifier.sendCommitNotification(event));
+  }
 
-
-  private GlobalConfiguration createGlobalConfiguration() {
+  private GlobalConfiguration createGlobalConfiguration(String url) {
     GlobalConfiguration configuration = new GlobalConfiguration();
-    configuration.setUrl(TEAMSCALE_INSTANCE_URL);
+    configuration.setUrl(url);
     configuration.setUsername("trillian");
     configuration.setPassword("secret");
     configuration.setDisableRepositoryConfiguration(false);
     return configuration;
   }
 
-  private Configuration createConfiguration() {
+  private Configuration createConfiguration(String url) {
     Configuration configuration = new Configuration();
-    configuration.setUrl(TEAMSCALE_INSTANCE_URL);
-    configuration.setUsername("trillian");
+    configuration.setUrl(url);
+    configuration.setUsername("arthur");
     configuration.setPassword("secret");
     return configuration;
   }
-
 }

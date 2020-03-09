@@ -19,6 +19,8 @@ import java.util.List;
 
 public class Notifier {
 
+  private static final String PUSH_EVENT = "SCM-Push-Event";
+
   private static final Logger LOG = LoggerFactory.getLogger(Notifier.class);
 
   private final Provider<AdvancedHttpClient> httpClientProvider;
@@ -79,6 +81,7 @@ public class Notifier {
         .post(createTeamscaleHookUrl(configuration.getUrl()))
         .basicAuth(configuration.getUsername(), configuration.getPassword())
         .jsonContent(notification)
+        .header("X-SCM-Event", PUSH_EVENT)
         .request();
     } catch (IOException e) {
       LOG.error("Could not notify teamscale instance with url: {}", configuration.getUrl());
