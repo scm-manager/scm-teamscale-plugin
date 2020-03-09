@@ -9,12 +9,12 @@ import javax.inject.Inject;
 
 @EagerSingleton
 @Extension
-public class CommitNotifyHook {
+public class RepositoryPushNotifyHook {
 
   private final Notifier notifier;
 
   @Inject
-  public CommitNotifyHook(Notifier notifier) {
+  public RepositoryPushNotifyHook(Notifier notifier) {
     this.notifier = notifier;
   }
 

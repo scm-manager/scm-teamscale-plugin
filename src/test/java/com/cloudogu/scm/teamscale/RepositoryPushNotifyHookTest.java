@@ -10,19 +10,19 @@ import sonia.scm.repository.PostReceiveRepositoryHookEvent;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class CommitNotifyHookTest {
+class RepositoryPushNotifyHookTest {
 
   @Mock
   private Notifier notifier;
 
-  private CommitNotifyHook hook;
+  private RepositoryPushNotifyHook hook;
 
   @Mock
   private PostReceiveRepositoryHookEvent event;
 
   @BeforeEach
   void initHook() {
-    hook = new CommitNotifyHook(notifier);
+    hook = new RepositoryPushNotifyHook(notifier);
   }
 
   @Test
