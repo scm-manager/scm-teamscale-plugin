@@ -30,7 +30,7 @@ public class RepositoryConfigHalEnricher implements HalEnricher {
   @Override
   public void enrich(HalEnricherContext context, HalAppender appender) {
     Repository repository = context.oneRequireByType(Repository.class);
-    if (!configStore.getGlobalConfiguration().isDisableRepositoryConfiguration() && RepositoryPermissions.custom(Constants.NAME, repository).isPermitted()) {
+    if (shouldAppendLink(repository)) {
       String linkBuilder = new LinkBuilder(scmPathInfoStoreProvider.get().get(), ConfigurationResource.class)
         .method("getConfiguration")
         .parameters(repository.getNamespace(), repository.getName())
@@ -38,6 +38,11 @@ public class RepositoryConfigHalEnricher implements HalEnricher {
 
       appender.appendLink("teamscaleConfig", linkBuilder);
     }
+  }
+
+  private boolean shouldAppendLink(Repository repository) {
+    return !configStore.getGlobalConfiguration().isDisableRepositoryConfiguration()
+      && RepositoryPermissions.custom(Constants.NAME, repository).isPermitted();
   }
 }
 

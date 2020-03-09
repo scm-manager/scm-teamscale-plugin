@@ -2,14 +2,11 @@ package com.cloudogu.scm.teamscale.config;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class XmlEncryptionAdapter extends XmlAdapter<String, String>
-{
+public class XmlEncryptionAdapter extends XmlAdapter<String, String> {
 
   @Override
-  public String marshal(String v) throws Exception
-  {
-    if (!EncryptionUtil.isEncrypted(v))
-    {
+  public String marshal(String v) {
+    if (!EncryptionUtil.isEncrypted(v)) {
       v = EncryptionUtil.encrypt(v);
     }
 
@@ -17,10 +14,8 @@ public class XmlEncryptionAdapter extends XmlAdapter<String, String>
   }
 
   @Override
-  public String unmarshal(String v) throws Exception
-  {
-    if (EncryptionUtil.isEncrypted(v))
-    {
+  public String unmarshal(String v){
+    if (EncryptionUtil.isEncrypted(v)) {
       v = EncryptionUtil.decrypt(v);
     }
 

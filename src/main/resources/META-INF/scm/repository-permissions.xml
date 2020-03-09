@@ -6,7 +6,6 @@
     <role>
       <name>TEAMSCALE</name>
       <verbs>
-        <verb>teamscale</verb>
         <verb>read</verb>
         <verb>pull</verb>
         <verb>commentPullRequest</verb>

@@ -87,6 +87,7 @@ class ConfigurationMapperTest {
     void shouldMapAttributesFromDto() {
       Configuration configuration = mapper.map(createDto(), createConfiguration());
       assertThat("heartofgo.ld").isEqualTo(configuration.getUrl());
+      assertThat("trillian").isEqualTo(configuration.getUsername());
     }
 
     @Test
