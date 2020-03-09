@@ -2,4 +2,17 @@
   <verbs>
     <verb>teamscale</verb>
   </verbs>
+  <roles>
+    <role>
+      <name>TEAMSCALE</name>
+      <verbs>
+        <verb>teamscale</verb>
+        <verb>read</verb>
+        <verb>pull</verb>
+        <verb>commentPullRequest</verb>
+        <verb>readCIStatus</verb>
+        <verb>writeCIStatus</verb>
+      </verbs>
+    </role>
+  </roles>
 </repository-permissions>

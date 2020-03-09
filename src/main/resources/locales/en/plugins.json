@@ -26,7 +26,7 @@
   "verbs": {
     "repository": {
       "teamscale": {
-        "displayName": "Configure Teamscale",
+        "displayName": "configure Teamscale",
         "description": "May modify the repository specific Teamscale configuration"
       }
     }
