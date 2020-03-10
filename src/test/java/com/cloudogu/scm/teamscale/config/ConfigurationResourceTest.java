@@ -19,6 +19,7 @@ import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -81,14 +82,14 @@ class ConfigurationResourceTest {
   @Test
   void shouldUpdateRepoConfig() throws URISyntaxException, IOException {
     MockHttpRequest request = MockHttpRequest
-      .put("/v2/teamscale/configuration")
+      .put("/v2/teamscale/configuration/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName())
       .content(readConfigJson("com/cloudogu/scm/resource/repoConfig.json"))
       .contentType(MediaType.APPLICATION_JSON_TYPE);
     MockHttpResponse response = new MockHttpResponse();
 
     dispatcher.invoke(request, response);
 
-    verify(service).updateGlobalConfiguration(any());
+    verify(service).updateRepositoryConfiguration(anyString(), anyString(), any());
     assertThat(response.getStatus()).isEqualTo(204);
   }
 

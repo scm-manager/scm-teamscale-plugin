@@ -61,22 +61,21 @@ class ConfigurationServiceTest {
 
     @Test
     void shouldGetEmptyConfiguration() {
+      String url = "http://scm-manager.org/teamscale";
       Configuration emptyConfig = new Configuration();
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(emptyConfig);
-      when(mapper.map(emptyConfig, REPOSITORY)).thenReturn(new ConfigurationDto("", "", ConfigurationMapper.DUMMY_PASSWORD));
+      when(mapper.map(emptyConfig, REPOSITORY)).thenReturn(new ConfigurationDto(url));
       ConfigurationDto configuration = service.getRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
-      assertThat(configuration.getPassword()).isEqualTo(ConfigurationMapper.DUMMY_PASSWORD);
+      assertThat(configuration.getUrl()).isEqualTo(url);
     }
 
     @Test
     void shouldGetRepositoryConfig() {
-      Configuration newConfig = new Configuration("hitchhiker.org", "trillian", "secret");
+      Configuration newConfig = new Configuration("hitchhiker.org");
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(newConfig);
-      when(mapper.map(newConfig, REPOSITORY)).thenReturn(new ConfigurationDto("hitchhiker.org", "trillian", "secret"));
+      when(mapper.map(newConfig, REPOSITORY)).thenReturn(new ConfigurationDto("hitchhiker.org"));
       ConfigurationDto configuration = service.getRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName());
       assertThat(configuration.getUrl()).isEqualTo(newConfig.getUrl());
-      assertThat(configuration.getUsername()).isEqualTo(newConfig.getUsername());
-      assertThat(configuration.getPassword()).isEqualTo(newConfig.getPassword());
     }
 
     @Test
@@ -87,17 +86,17 @@ class ConfigurationServiceTest {
 
     @Test
     void shouldThrowExceptionIfNotPermittedToUpdateConfig() {
-      ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org", "tricia", "trillian");
+      ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org");
       doThrow(AuthorizationException.class).when(subject).checkPermission(anyString());
       assertThrows(AuthorizationException.class, () -> service.updateRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto));
     }
 
     @Test
     void shouldUpdateRepositoryConfig() {
-      Configuration oldConfig = new Configuration("hitchhiker.org", "trillian", "secret");
+      Configuration oldConfig = new Configuration("hitchhiker.org");
       when(configStore.getConfiguration(REPOSITORY)).thenReturn(oldConfig);
 
-      ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org", "tricia", "trillian");
+      ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org");
       service.updateRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto);
 
       verify(mapper).map(newConfigDto, oldConfig);
@@ -113,8 +112,6 @@ class ConfigurationServiceTest {
     GlobalConfigurationDto configuration = service.getGlobalConfiguration();
 
     assertThat(configuration.getUrl()).isEqualTo(newConfig.getUrl());
-    assertThat(configuration.getUsername()).isEqualTo(newConfig.getUsername());
-    assertThat(configuration.getPassword()).isEqualTo(newConfig.getPassword());
     assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
   }
 
@@ -136,8 +133,6 @@ class ConfigurationServiceTest {
 
   private GlobalConfigurationDto createGlobalConfigurationDto() {
     GlobalConfigurationDto configuration = new GlobalConfigurationDto();
-    configuration.setUsername("trillian");
-    configuration.setPassword("secret");
     configuration.setUrl("");
     configuration.setDisableRepositoryConfiguration(false);
     return configuration;
@@ -146,8 +141,6 @@ class ConfigurationServiceTest {
   private GlobalConfiguration createGlobalConfiguration() {
     GlobalConfiguration configuration = new GlobalConfiguration();
     configuration.setUrl("");
-    configuration.setUsername("trillian");
-    configuration.setPassword("secret");
     configuration.setDisableRepositoryConfiguration(false);
     return configuration;
   }

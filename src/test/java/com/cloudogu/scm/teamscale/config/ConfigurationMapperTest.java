@@ -87,76 +87,38 @@ class ConfigurationMapperTest {
     void shouldMapAttributesFromDto() {
       Configuration configuration = mapper.map(createDto(), createConfiguration());
       assertThat("heartofgo.ld").isEqualTo(configuration.getUrl());
-      assertThat("trillian").isEqualTo(configuration.getUsername());
+    }
+  }
+    @Test
+    void shouldMapGlobalConfigurationAttributesToDto() {
+      GlobalConfigurationDto dto = mapper.map(createGlobalConfiguration());
+      assertThat(dto.isDisableRepositoryConfiguration()).isFalse();
     }
 
     @Test
-    void shouldReplacePasswordAfterMappingDto() {
-      ConfigurationDto configuration = mapper.map(createConfiguration(), createRepository());
-      assertThat(ConfigurationMapper.DUMMY_PASSWORD).isEqualTo(configuration.getPassword());
+    void shouldMapGlobalConfigurationAttributesFromDto() {
+      GlobalConfiguration configuration = mapper.map(createGlobalConfigurationDto(), createGlobalConfiguration());
+      assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
     }
 
     @Test
-    void shouldRestorePasswordAfterMappingFromDto() {
-      ConfigurationDto dto = createDto();
-      dto.setPassword(ConfigurationMapper.DUMMY_PASSWORD);
-
-      Configuration configuration = mapper.map(dto, createConfiguration());
-      assertThat("secret").isEqualTo(configuration.getPassword());
+    void shouldNotAddUpdateLinkToDtoIfNotPermitted() {
+      ConfigurationDto dto = mapper.map(createConfiguration(), createRepository());
+      assertThat(dto.getLinks().getLinkBy("update").isPresent()).isFalse();
     }
-  }
-
-  @Test
-  void shouldMapGlobalConfigurationAttributesToDto() {
-    GlobalConfigurationDto dto = mapper.map(createGlobalConfiguration());
-    assertThat(dto.isDisableRepositoryConfiguration()).isFalse();
-  }
-
-  @Test
-  void shouldMapGlobalConfigurationAttributesFromDto() {
-    GlobalConfiguration configuration = mapper.map(createGlobalConfigurationDto(), createGlobalConfiguration());
-    assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
-  }
-
-  @Test
-  void shouldRestorePasswordAfterMappingFromGlobalDto() {
-    GlobalConfigurationDto dto = createGlobalConfigurationDto();
-    dto.setPassword(ConfigurationMapper.DUMMY_PASSWORD);
-
-    GlobalConfiguration configuration = mapper.map(dto, createGlobalConfiguration());
-    assertEquals("secret", configuration.getPassword());
-  }
-
-  @Test
-  void shouldReplacePasswordAfterMappingGlobalDto() {
-    GlobalConfigurationDto configuration = mapper.map(createGlobalConfiguration());
-    assertThat(ConfigurationMapper.DUMMY_PASSWORD).isEqualTo(configuration.getPassword());
-  }
-
-  @Test
-  void shouldNotAddUpdateLinkToDtoIfNotPermitted() {
-    ConfigurationDto dto = mapper.map(createConfiguration(), createRepository());
-    assertThat(dto.getLinks().getLinkBy("update").isPresent()).isFalse();
-  }
 
 
   private Configuration createConfiguration() {
-    return new Configuration("heartofgo.ld",
-      "trillian",
-      "secret");
+    return new Configuration("heartofgo.ld");
   }
 
   private ConfigurationDto createDto() {
-    return new ConfigurationDto("heartofgo.ld",
-      "trillian",
-      "secret");
+    return new ConfigurationDto("heartofgo.ld");
   }
 
   private GlobalConfiguration createGlobalConfiguration() {
     GlobalConfiguration configuration = new GlobalConfiguration();
     configuration.setUrl("");
-    configuration.setUsername("trillian");
-    configuration.setPassword("secret");
     configuration.setDisableRepositoryConfiguration(false);
     return configuration;
   }

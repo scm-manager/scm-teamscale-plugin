@@ -4,12 +4,8 @@
       "link": "Teamscale",
       "title": "Teamscale",
       "form": {
-        "url": "URL",
-        "url-helptext": "URL of Teamscale instance.",
-        "username": "Username",
-        "username-helptext": "The Teamscale user name",
-        "password": "Password",
-        "password-helptext": "The Teamscale password"
+        "url": "Instance URL",
+        "url-helptext": "URL of Teamscale instance."
       }
     }
   },

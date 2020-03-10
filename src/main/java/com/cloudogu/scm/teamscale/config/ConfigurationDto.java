@@ -14,8 +14,6 @@ import lombok.Setter;
 public class ConfigurationDto extends HalRepresentation {
 
   private String url;
-  private String username;
-  private String password;
 
   @Override
   @SuppressWarnings("squid:S1185") // We want to have this method available in this package
