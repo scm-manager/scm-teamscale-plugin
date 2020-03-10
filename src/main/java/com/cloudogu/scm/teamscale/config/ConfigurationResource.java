@@ -41,7 +41,7 @@ public class ConfigurationResource {
     tags = "Teamscale Plugin",
     operationId = "teamscale_update_repo_config"
   )
-  @ApiResponse(responseCode = "200", description = "success")
+  @ApiResponse(responseCode = "204", description = "update success")
   @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
   @ApiResponse(responseCode = "403", description = "not authorized /  the current user does not have the right privilege")
   @ApiResponse(
@@ -54,7 +54,7 @@ public class ConfigurationResource {
   )
   public Response updateConfiguration(@PathParam("namespace") String namespace, @PathParam("name") String name, ConfigurationDto updatedConfig) {
     configurationService.updateRepositoryConfiguration(namespace, name, updatedConfig);
-    return Response.ok().build();
+    return Response.noContent().build();
   }
 
   @GET
@@ -104,7 +104,7 @@ public class ConfigurationResource {
     tags = "Redmine Plugin",
     operationId = "teamscale_update_global_config"
   )
-  @ApiResponse(responseCode = "200", description = "update success")
+  @ApiResponse(responseCode = "204", description = "update success")
   @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
   @ApiResponse(responseCode = "403", description = "not authorized /  the current user does not have the right privilege")
   @ApiResponse(
@@ -117,7 +117,7 @@ public class ConfigurationResource {
   )
   public Response updateGlobalConfiguration(GlobalConfigurationDto updatedConfig) {
     configurationService.updateGlobalConfiguration(updatedConfig);
-    return Response.ok().build();
+    return Response.noContent().build();
   }
 
   @GET
