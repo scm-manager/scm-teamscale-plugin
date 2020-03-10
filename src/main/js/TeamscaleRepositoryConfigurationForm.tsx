@@ -41,8 +41,6 @@ class TeamscaleRepositoryConfigurationForm extends React.Component<Props, Teamsc
       <>
         <div className="columns is-multiline">
           <div className="column is-full">{this.renderInputField("url")}</div>
-          <div className="column is-half">{this.renderInputField("username")}</div>
-          <div className="column is-half">{this.renderInputField("password", "password")}</div>
         </div>
       </>
     );

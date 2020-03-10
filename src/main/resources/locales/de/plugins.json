@@ -4,12 +4,8 @@
       "link": "Teamscale",
       "title": "Teamscale",
       "form": {
-        "url": "URL",
-        "url-helptext": "Die URL der Teamscale Instanz.",
-        "username": "Benutzername",
-        "username-helptext": "Der Teamscale Benutzername",
-        "password": "Passwort",
-        "password-helptext": "Das Teamscale Passwort"
+        "url": "Instanz-URL",
+        "url-helptext": "Die URL der Teamscale Instanz."
       }
     }
   },
