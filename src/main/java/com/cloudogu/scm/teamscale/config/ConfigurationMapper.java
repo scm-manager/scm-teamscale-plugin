@@ -38,11 +38,6 @@ public abstract class ConfigurationMapper extends BaseMapper {
   public abstract GlobalConfiguration map(GlobalConfigurationDto configurationDto, @Context GlobalConfiguration oldConfiguration);
 
   @AfterMapping
-  public void replacePasswordWithDummy(@MappingTarget ConfigurationDto target) {
-    target.setPassword(DUMMY_PASSWORD);
-  }
-
-  @AfterMapping
   public void addLinks(GlobalConfiguration source, @MappingTarget GlobalConfigurationDto target) {
     Links.Builder linksBuilder = linkingTo().self(globalSelf());
     if (ConfigurationPermissions.write(Constants.NAME).isPermitted()) {
@@ -59,13 +54,6 @@ public abstract class ConfigurationMapper extends BaseMapper {
   private String globalUpdate() {
     LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStore.get(), ConfigurationResource.class);
     return linkBuilder.method("updateGlobalConfiguration").parameters().href();
-  }
-
-  @AfterMapping
-  public void restorePasswordOnDummy(@MappingTarget Configuration target, @Context Configuration oldConfiguration) {
-    if (DUMMY_PASSWORD.equals(target.getPassword())) {
-      target.setPassword(oldConfiguration.getPassword());
-    }
   }
 
   @AfterMapping

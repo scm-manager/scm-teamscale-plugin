@@ -79,7 +79,6 @@ public class Notifier {
     try {
       client
         .post(createTeamscaleHookUrl(configuration.getUrl()))
-        .basicAuth(configuration.getUsername(), configuration.getPassword())
         .jsonContent(notification)
         .header("X-SCM-Event", PUSH_EVENT)
         .request();

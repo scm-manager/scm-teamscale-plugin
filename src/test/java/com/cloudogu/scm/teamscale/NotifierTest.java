@@ -177,8 +177,6 @@ class NotifierTest {
   private GlobalConfiguration createGlobalConfiguration(String url) {
     GlobalConfiguration configuration = new GlobalConfiguration();
     configuration.setUrl(url);
-    configuration.setUsername("trillian");
-    configuration.setPassword("secret");
     configuration.setDisableRepositoryConfiguration(false);
     return configuration;
   }
@@ -186,8 +184,6 @@ class NotifierTest {
   private Configuration createConfiguration(String url) {
     Configuration configuration = new Configuration();
     configuration.setUrl(url);
-    configuration.setUsername("arthur");
-    configuration.setPassword("secret");
     return configuration;
   }
 }

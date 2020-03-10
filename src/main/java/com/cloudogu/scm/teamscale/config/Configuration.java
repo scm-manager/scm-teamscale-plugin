@@ -10,7 +10,6 @@ import sonia.scm.util.Util;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,9 +20,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class Configuration implements Validateable {
 
   private String url;
-  private String username;
-  @XmlJavaTypeAdapter(XmlEncryptionAdapter.class)
-  private String password;
 
   @Override
   public boolean isValid() {
