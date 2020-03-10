@@ -89,7 +89,11 @@ public class Notifier {
   }
 
   private String createTeamscaleHookUrl(String url) {
-    return url + "/scm-manager-hook";
+    String hookUrl = url;
+    if (!hookUrl.endsWith("/")) {
+      hookUrl += "/";
+    }
+    return hookUrl + "scm-manager-hook";
   }
 
   private Notification createNotification(Repository repository) {

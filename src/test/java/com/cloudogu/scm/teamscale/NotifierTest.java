@@ -40,7 +40,7 @@ class NotifierTest {
   private Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
 
   private String SCM_BASE_URL = "http://www.scm-manager.org/scm";
-  private String TEAMSCALE_INSTANCE_URL = "http://teamscale.scm-manager.org/";
+  private String TEAMSCALE_INSTANCE_URL = "http://teamscale.scm-manager.org";
   private String TEAMSCALE_HOOK_URL = TEAMSCALE_INSTANCE_URL + "/scm-manager-hook";
 
   @Mock
