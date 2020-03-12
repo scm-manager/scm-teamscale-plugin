@@ -1,6 +1,5 @@
 package com.cloudogu.scm.teamscale;
 
-import com.cloudogu.scm.teamscale.config.ConfigurationProvider;
 import com.github.legman.Subscribe;
 import sonia.scm.EagerSingleton;
 import sonia.scm.plugin.Extension;
@@ -18,7 +17,7 @@ public class RepositoryPushNotifyHook {
   private final Notifier notifier;
 
   @Inject
-  public RepositoryPushNotifyHook(Notifier notifier, ConfigurationProvider configurationProvider) {
+  public RepositoryPushNotifyHook(Notifier notifier) {
     this.notifier = notifier;
   }
 
