@@ -12,14 +12,14 @@ import javax.inject.Inject;
 import static sonia.scm.ContextEntry.ContextBuilder.entity;
 import static sonia.scm.NotFoundException.notFound;
 
-public class ConfigurationService {
+class ConfigurationService {
 
   private final ConfigStore configStore;
   private final RepositoryManager repositoryManager;
   private final ConfigurationMapper mapper;
 
   @Inject
-  public ConfigurationService(ConfigStore configStore, RepositoryManager repositoryManager, ConfigurationMapper mapper) {
+ public ConfigurationService(ConfigStore configStore, RepositoryManager repositoryManager, ConfigurationMapper mapper) {
     this.configStore = configStore;
     this.repositoryManager = repositoryManager;
     this.mapper = mapper;

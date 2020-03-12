@@ -74,8 +74,8 @@ class TeamscaleGlobalConfigurationForm extends React.Component<Props, TeamscaleG
     return (
       <Checkbox
         name={name}
-        label={t("scm-redmine-plugin.config.form." + name)}
-        helpText={t("scm-redmine-plugin.config.form." + name + "-helptext")}
+        label={t("scm-teamscale-plugin.config.form." + name)}
+        helpText={t("scm-teamscale-plugin.config.form." + name + "-helptext")}
         checked={this.state[name]}
         onChange={this.configChangeHandler}
         disabled={readOnly}

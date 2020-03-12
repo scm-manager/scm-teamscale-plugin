@@ -6,10 +6,10 @@ import sonia.scm.repository.Repository;
 import sonia.scm.store.ConfigurationStore;
 import sonia.scm.store.ConfigurationStoreFactory;
 
-@Singleton
-public class ConfigStore {
+import static com.cloudogu.scm.teamscale.Constants.NAME;
 
-  public static final String NAME = "teamscale";
+@Singleton
+class ConfigStore {
 
   private final ConfigurationStoreFactory storeFactory;
 
