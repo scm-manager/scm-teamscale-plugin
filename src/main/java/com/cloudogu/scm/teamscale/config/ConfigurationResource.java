@@ -101,7 +101,7 @@ public class ConfigurationResource {
   @Operation(
     summary = "Update global teamscale configuration",
     description = "Modifies the global teamscale configuration.",
-    tags = "Redmine Plugin",
+    tags = "Teamscale Plugin",
     operationId = "teamscale_update_global_config"
   )
   @ApiResponse(responseCode = "204", description = "update success")
@@ -126,7 +126,7 @@ public class ConfigurationResource {
   @Operation(
     summary = "Get global teamscale configuration",
     description = "Returns the global teamscale configuration.",
-    tags = "Redmine Plugin",
+    tags = "Teamscale Plugin",
     operationId = "teamscale_get_global_config"
   )
   @ApiResponse(
