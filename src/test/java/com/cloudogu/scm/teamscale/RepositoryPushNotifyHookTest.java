@@ -23,7 +23,6 @@
  */
 package com.cloudogu.scm.teamscale;
 
-import com.cloudogu.scm.teamscale.config.ConfigurationProvider;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,12 +56,10 @@ class RepositoryPushNotifyHookTest {
   private HookContext hookContext;
   @Mock
   private HookBranchProvider branchProvider;
-  @Mock
-  private ConfigurationProvider configurationProvider;
 
   @BeforeEach
   void initHook() {
-    hook = new RepositoryPushNotifyHook(notifier, configurationProvider);
+    hook = new RepositoryPushNotifyHook(notifier);
   }
 
   @BeforeEach
