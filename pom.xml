@@ -32,7 +32,7 @@
   <parent>
     <artifactId>scm-plugins</artifactId>
     <groupId>sonia.scm.plugins</groupId>
-    <version>2.0.0-rc5</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>scm-teamscale-plugin</artifactId>
@@ -54,6 +54,13 @@
       <artifactId>scm-ci-plugin</artifactId>
       <version>2.0.0-rc2</version>
     </dependency>
+
+    <dependency>
+      <groupId>sonia.scm.plugins</groupId>
+      <artifactId>scm-review-plugin</artifactId>
+      <version>2.0.0-rc9-1</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <build>
@@ -64,6 +71,7 @@
         <configuration>
           <resourcePackages>
             <resourcePackage>com.cloudogu.scm.teamscale.config</resourcePackage>
+            <resourcePackage>com.cloudogu.scm.teamscale</resourcePackage>
           </resourcePackages>
         </configuration>
       </plugin>
