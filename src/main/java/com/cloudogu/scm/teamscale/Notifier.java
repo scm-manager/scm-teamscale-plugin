@@ -39,8 +39,6 @@ import java.util.Optional;
 
 public class Notifier {
 
-  private static final String PUSH_EVENT = "SCM-Push-Event";
-
   private static final Logger LOG = LoggerFactory.getLogger(Notifier.class);
 
   private final Provider<AdvancedHttpClient> httpClientProvider;
@@ -54,28 +52,26 @@ public class Notifier {
     this.configurationProvider = configurationProvider;
   }
 
-  public void notifyWithBranch(Repository repository, String branchName) {
-    Notification notification = createNotificationWithBranch(repository, branchName);
-    notifyViaHttp(repository, notification);
+  public String createRepositoryId(Repository repository) {
+    return repository.getNamespace() + "/" + repository.getName();
   }
 
-  public void notifyWithoutBranch(Repository repository) {
-    Notification notification = createNotification(repository);
-    notifyViaHttp(repository, notification);
+  public String createRepositoryUrl(Repository repository) {
+    return String.format("%s/repo/%s/%s", scmConfiguration.getBaseUrl(), repository.getNamespace(), repository.getName());
   }
 
-  private void notifyViaHttp(Repository repository, Notification notification) {
+  public void notifyViaHttp(Repository repository, Notification notification, String eventType) {
     Optional<Configuration> configuration = configurationProvider.evaluateConfiguration(repository);
-    configuration.ifPresent(config -> notifyViaHttp(config, notification));
+    configuration.ifPresent(config -> notifyViaHttp(config, notification, eventType));
   }
 
-  private void notifyViaHttp(Configuration configuration, Notification notification) {
+  public void notifyViaHttp(Configuration configuration, Notification notification, String eventType) {
     AdvancedHttpClient client = httpClientProvider.get();
     try {
       client
         .post(createTeamscaleHookUrl(configuration.getUrl()))
         .jsonContent(notification)
-        .header("X-SCM-Event", PUSH_EVENT)
+        .header("X-SCM-Event", eventType)
         .request();
     } catch (IOException e) {
       LOG.warn("Could not notify teamscale instance with url: {}", configuration.getUrl());
@@ -84,16 +80,5 @@ public class Notifier {
 
   private String createTeamscaleHookUrl(String url) {
     return HttpUtil.append(url, "scm-manager-hook");
-  }
-
-  private Notification createNotification(Repository repository) {
-    String repositoryUrl = String.format("%s/repo/%s/%s", scmConfiguration.getBaseUrl(), repository.getNamespace(), repository.getName());
-    String repositoryId = repository.getNamespace() + "/" + repository.getName();
-    return new Notification(repositoryUrl, repositoryId);
-  }
-
-  private Notification createNotificationWithBranch(Repository repository, String branchName) {
-    Notification notification = createNotification(repository);
-    return new Notification(notification.getRepositoryUrl(), notification.getRepositoryId(), branchName);
   }
 }

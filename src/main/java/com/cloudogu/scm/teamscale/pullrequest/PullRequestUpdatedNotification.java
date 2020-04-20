@@ -21,14 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cloudogu.scm.teamscale;
+package com.cloudogu.scm.teamscale.pullrequest;
 
-import lombok.AllArgsConstructor;
+import com.cloudogu.scm.teamscale.Notification;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class Notification {
-  private final String repositoryUrl;
-  private final String repositoryId;
+public class PullRequestUpdatedNotification extends Notification {
+  private final String pullRequestId;
+
+  public PullRequestUpdatedNotification(String repositoryUrl, String repositoryId, String pullRequestId) {
+    super(repositoryUrl, repositoryId);
+    this.pullRequestId = pullRequestId;
+  }
 }

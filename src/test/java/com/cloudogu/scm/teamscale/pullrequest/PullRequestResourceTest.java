@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cloudogu.scm.teamscale;
+package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.comment.api.CommentResource;
 import com.cloudogu.scm.review.comment.api.CommentRootResource;
@@ -66,7 +66,6 @@ public class PullRequestResourceTest {
 
   @Mock
   private CommentResource commentResource;
-
 
   private RestDispatcher restDispatcher;
 

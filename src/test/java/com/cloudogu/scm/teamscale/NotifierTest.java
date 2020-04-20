@@ -23,8 +23,10 @@
  */
 package com.cloudogu.scm.teamscale;
 
+import com.cloudogu.scm.review.pullrequest.service.PullRequest;
 import com.cloudogu.scm.teamscale.config.Configuration;
 import com.cloudogu.scm.teamscale.config.ConfigurationProvider;
+import com.cloudogu.scm.teamscale.pullrequest.PullRequestCreatedNotification;
 import com.google.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,10 +56,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class NotifierTest {
 
-  private Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
-
-  private String SCM_BASE_URL = "http://www.scm-manager.org/scm";
-  private String TEAMSCALE_INSTANCE_URL = "http://teamscale.scm-manager.org";
+  private final Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
+  private final String EVENT_TYPE = "SCM-X-Event";
+  private final String SCM_BASE_URL = "http://www.scm-manager.org/scm";
+  private final String TEAMSCALE_INSTANCE_URL = "http://teamscale.scm-manager.org";
+  private final String NAMESPACE_AND_NAME = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
+  private final String REPOSITORY_URL = SCM_BASE_URL + "/repo/" + NAMESPACE_AND_NAME;
 
   @Mock
   private Provider<AdvancedHttpClient> httpClientProvider;
@@ -89,38 +93,68 @@ class NotifierTest {
   }
 
   @Test
-  void shouldSendNotificationWithBranchName() {
+  void shouldSendPushNotificationWithBranchName() {
     when(configurationProvider.evaluateConfiguration(REPOSITORY)).thenReturn(createConfiguration(TEAMSCALE_INSTANCE_URL));
 
     String branchName = "feature/awesome";
-    String nameSpaceAndName = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
 
-    notifier.notifyWithBranch(REPOSITORY, branchName);
+    PushNotification notification = new PushNotification(REPOSITORY_URL, NAMESPACE_AND_NAME, branchName);
 
-    Notification jsonValue = jsonCaptor.getValue();
+    notifier.notifyViaHttp(REPOSITORY, notification, EVENT_TYPE);
+
+    PushNotification jsonValue = (PushNotification) jsonCaptor.getValue();
     assertThat(jsonValue.getBranchName()).isEqualTo(branchName);
-    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + nameSpaceAndName);
-    assertThat(jsonValue.getRepositoryId()).isEqualTo(nameSpaceAndName);
+    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + NAMESPACE_AND_NAME);
+    assertThat(jsonValue.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
   }
 
   @Test
-  void shouldSendNotificationWithoutBranchname() {
+  void shouldSendPushNotificationWithoutBranchname() {
     when(configurationProvider.evaluateConfiguration(REPOSITORY)).thenReturn(createConfiguration(TEAMSCALE_INSTANCE_URL));
 
-    String nameSpaceAndName = REPOSITORY.getNamespace() + "/" + REPOSITORY.getName();
+    PushNotification notification = new PushNotification(REPOSITORY_URL, NAMESPACE_AND_NAME);
 
-    notifier.notifyWithoutBranch(REPOSITORY);
+    notifier.notifyViaHttp(REPOSITORY, notification, EVENT_TYPE);
 
     Notification jsonValue = jsonCaptor.getValue();
-    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + nameSpaceAndName);
-    assertThat(jsonValue.getRepositoryId()).isEqualTo(nameSpaceAndName);
+    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + NAMESPACE_AND_NAME);
+    assertThat(jsonValue.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
+  }
+
+  @Test
+  void shouldSendPullRequestCreatedNotification() {
+    when(configurationProvider.evaluateConfiguration(REPOSITORY)).thenReturn(createConfiguration(TEAMSCALE_INSTANCE_URL));
+
+    PullRequest pullRequest = createPullRequest();
+    PullRequestCreatedNotification notification =
+      new PullRequestCreatedNotification(REPOSITORY_URL, NAMESPACE_AND_NAME, pullRequest.getId(), pullRequest.getSource(), pullRequest.getTarget());
+
+    notifier.notifyViaHttp(REPOSITORY, notification, EVENT_TYPE);
+
+    PullRequestCreatedNotification jsonValue = (PullRequestCreatedNotification) jsonCaptor.getValue();
+    assertThat(jsonValue.getRepositoryUrl()).isEqualTo(SCM_BASE_URL + "/repo/" + NAMESPACE_AND_NAME);
+    assertThat(jsonValue.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
+    assertThat(jsonValue.getPullRequestId()).isEqualTo(pullRequest.getId());
+    assertThat(jsonValue.getSourceBranch()).isEqualTo(pullRequest.getSource());
+    assertThat(jsonValue.getTargetBranch()).isEqualTo(pullRequest.getTarget());
+  }
+
+  private PullRequest createPullRequest() {
+    PullRequest pullRequest = new PullRequest();
+    pullRequest.setId("pr-1");
+    pullRequest.setAuthor("trillian");
+    pullRequest.setSource("develop");
+    pullRequest.setTarget("master");
+    return pullRequest;
   }
 
   @Test
   void shouldNotSendNotificationIfNoValidConfigExist() {
     when(configurationProvider.evaluateConfiguration(REPOSITORY)).thenReturn(Optional.empty());
 
-    notifier.notifyWithoutBranch(REPOSITORY);
+    PushNotification notification = new PushNotification(REPOSITORY_URL, NAMESPACE_AND_NAME);
+
+    notifier.notifyViaHttp(REPOSITORY, notification, EVENT_TYPE);
 
     verify(httpClient, never()).post(anyString());
   }

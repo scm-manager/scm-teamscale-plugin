@@ -21,56 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cloudogu.scm.teamscale;
+package com.cloudogu.scm.teamscale.pullrequest;
 
+import com.cloudogu.scm.review.pullrequest.service.PullRequest;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestEvent;
+import com.cloudogu.scm.teamscale.Notifier;
 import com.github.legman.Subscribe;
 import sonia.scm.EagerSingleton;
+import sonia.scm.HandlerEventType;
 import sonia.scm.plugin.Extension;
-import sonia.scm.repository.PostReceiveRepositoryHookEvent;
+import sonia.scm.plugin.Requires;
 import sonia.scm.repository.Repository;
-import sonia.scm.repository.api.HookContext;
-import sonia.scm.repository.api.HookFeature;
 
 import javax.inject.Inject;
-import java.util.List;
 
-@EagerSingleton
+@Requires("scm-review-plugin")
 @Extension
-public class RepositoryPushNotifyHook {
+@EagerSingleton
+public class PullRequestUpdatedNotifyHook {
 
-  private static final String PUSH_EVENT = "SCM-Push-Event";
+  private static final String EVENT_TYPE = "SCM-Pull-Request-Updated-Event";
   private final Notifier notifier;
 
   @Inject
-  public RepositoryPushNotifyHook(Notifier notifier) {
+  public PullRequestUpdatedNotifyHook(Notifier notifier) {
     this.notifier = notifier;
   }
 
   @Subscribe
-  public void notify(PostReceiveRepositoryHookEvent event) {
-    if (event.getContext().isFeatureSupported(HookFeature.BRANCH_PROVIDER)) {
-      for (String branchName : getBranchesFromContext(event.getContext())) {
-        PushNotification notification = createPushNotificationWithBranch(event.getRepository(), branchName);
-        notifier.notifyViaHttp(event.getRepository(), notification, PUSH_EVENT);
-      }
-    } else {
-      PushNotification notification = createPushNotification(event.getRepository());
-      notifier.notifyViaHttp(event.getRepository(), notification, PUSH_EVENT);
+  public void handleEvent(PullRequestEvent event) {
+    if (event.getEventType() == HandlerEventType.MODIFY) {
+      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getItem()), EVENT_TYPE);
     }
   }
 
-  private List<String> getBranchesFromContext(HookContext context) {
-    return context.getBranchProvider().getCreatedOrModified();
-  }
-
-  private PushNotification createPushNotification(Repository repository) {
+  private PullRequestUpdatedNotification createPullRequestUpdatedNotification(Repository repository, PullRequest pullRequest) {
     String repositoryUrl = notifier.createRepositoryUrl(repository);
     String repositoryId = notifier.createRepositoryId(repository);
-    return new PushNotification(repositoryUrl, repositoryId);
-  }
-
-  private PushNotification createPushNotificationWithBranch(Repository repository, String branchName) {
-    PushNotification notification = createPushNotification(repository);
-    return new PushNotification(notification.getRepositoryUrl(), notification.getRepositoryId(), branchName);
+    return new PullRequestUpdatedNotification(repositoryUrl, repositoryId, pullRequest.getId());
   }
 }

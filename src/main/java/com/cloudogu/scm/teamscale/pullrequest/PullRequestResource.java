@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.cloudogu.scm.teamscale;
+package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;

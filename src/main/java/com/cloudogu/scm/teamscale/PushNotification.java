@@ -23,12 +23,19 @@
  */
 package com.cloudogu.scm.teamscale;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class Notification {
-  private final String repositoryUrl;
-  private final String repositoryId;
+public class PushNotification extends Notification {
+  private String branchName;
+
+  public PushNotification(String repositoryUrl, String repositoryId) {
+    super(repositoryUrl, repositoryId);
+  }
+
+  public PushNotification(String repositoryUrl, String repositoryId, String branchName) {
+    this(repositoryUrl, repositoryId);
+    this.branchName = branchName;
+  }
 }
