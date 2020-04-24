@@ -74,7 +74,7 @@ public class Notifier {
         .header("X-SCM-Event", eventType)
         .request();
     } catch (IOException e) {
-      LOG.warn("Could not notify teamscale instance with url: {}", configuration.getUrl());
+      LOG.warn("Could not notify teamscale instance with url: {}", configuration.getUrl(), e);
     }
   }
 
