@@ -5,7 +5,9 @@
       "title": "Teamscale",
       "form": {
         "url": "Instance URL",
-        "url-helptext": "URL of Teamscale instance."
+        "urlHelptext": "URL of Teamscale instance.",
+        "disableRepositoryConfiguration": "Do not allow repository configuration.",
+        "disableRepositoryConfigurationHelptext": "Do not allow repository owners to configure teamscale."
       }
     }
   },

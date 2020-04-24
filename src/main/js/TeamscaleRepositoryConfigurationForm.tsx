@@ -75,7 +75,7 @@ class TeamscaleRepositoryConfigurationForm extends React.Component<Props, Teamsc
       <InputField
         type={type}
         label={t("scm-teamscale-plugin.config.form." + name)}
-        helpText={t("scm-teamscale-plugin.config.form." + name + "-helptext")}
+        helpText={t("scm-teamscale-plugin.config.form." + name + "Helptext")}
         onChange={this.configChangeHandler}
         value={this.state[name]}
         name={name}
