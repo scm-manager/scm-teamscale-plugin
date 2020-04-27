@@ -50,7 +50,7 @@ public class PullRequestUpdatedNotifyHook {
 
   @Subscribe
   public void handleEvent(PullRequestEvent event) {
-    if (event.getEventType() == HandlerEventType.MODIFY) {
+    if (event.getEventType() == HandlerEventType.MODIFY && notifier.isTeamscaleConfigured(event.getRepository())) {
       notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getItem()), EVENT_TYPE);
     }
   }

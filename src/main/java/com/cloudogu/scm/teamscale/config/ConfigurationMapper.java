@@ -45,23 +45,19 @@ import static de.otto.edison.hal.Links.linkingTo;
 @Mapper
 public abstract class ConfigurationMapper extends BaseMapper {
 
-  @VisibleForTesting
-  @SuppressWarnings("squid:S2068")
-  public static final String DUMMY_PASSWORD = "__DUMMY__";
-
   @Inject
   private ScmPathInfoStore scmPathInfoStore;
 
   public abstract ConfigurationDto map(Configuration configuration, @Context Repository repository);
 
-  public abstract Configuration map(ConfigurationDto configurationDto, @Context Configuration oldConfiguration);
+  public abstract Configuration map(ConfigurationDto configurationDto);
 
   public abstract GlobalConfigurationDto map(GlobalConfiguration configuration);
 
-  public abstract GlobalConfiguration map(GlobalConfigurationDto configurationDto, @Context GlobalConfiguration oldConfiguration);
+  public abstract GlobalConfiguration map(GlobalConfigurationDto configurationDto);
 
   @AfterMapping
-  public void addLinks(GlobalConfiguration source, @MappingTarget GlobalConfigurationDto target) {
+  public void addLinks(@MappingTarget GlobalConfigurationDto target) {
     Links.Builder linksBuilder = linkingTo().self(globalSelf());
     if (ConfigurationPermissions.write(Constants.NAME).isPermitted()) {
       linksBuilder.single(Link.link("update", globalUpdate()));

@@ -50,7 +50,7 @@ public class PullRequestCreatedNotifyHook {
 
   @Subscribe
   public void handleEvent(PullRequestEvent event) {
-    if (event.getEventType() == HandlerEventType.CREATE) {
+    if (event.getEventType() == HandlerEventType.CREATE && notifier.isTeamscaleConfigured(event.getRepository())) {
       notifier.notifyViaHttp(event.getRepository(), createPullRequestCreatedNotification(event.getRepository(), event.getItem()), PULL_REQUEST_CREATED_EVENT);
     }
   }

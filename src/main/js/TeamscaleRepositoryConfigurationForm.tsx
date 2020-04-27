@@ -50,13 +50,9 @@ class TeamscaleRepositoryConfigurationForm extends React.Component<Props, Teamsc
           {
             ...this.state
           },
-          this.isStateValid()
+          true
         )
     );
-  };
-
-  isStateValid = () => {
-    return !!this.state.url;
   };
 
   render() {

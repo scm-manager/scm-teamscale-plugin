@@ -108,7 +108,7 @@ class ConfigurationMapperTest {
 
     @Test
     void shouldMapAttributesFromDto() {
-      Configuration configuration = mapper.map(createDto(), createConfiguration());
+      Configuration configuration = mapper.map(createDto());
       assertThat("heartofgo.ld").isEqualTo(configuration.getUrl());
     }
   }
@@ -120,7 +120,7 @@ class ConfigurationMapperTest {
 
     @Test
     void shouldMapGlobalConfigurationAttributesFromDto() {
-      GlobalConfiguration configuration = mapper.map(createGlobalConfigurationDto(), createGlobalConfiguration());
+      GlobalConfiguration configuration = mapper.map(createGlobalConfigurationDto());
       assertThat(configuration.isDisableRepositoryConfiguration()).isFalse();
     }
 

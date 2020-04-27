@@ -58,7 +58,7 @@ class ConfigurationService {
   public void updateRepositoryConfiguration(String namespace, String name, ConfigurationDto updatedConfig) {
     Repository repository = loadRepository(namespace, name);
     RepositoryPermissions.custom(Constants.NAME, repository).check();
-    configStore.storeConfiguration(mapper.map(updatedConfig, configStore.getConfiguration(repository)), repository);
+    configStore.storeConfiguration(mapper.map(updatedConfig), repository);
   }
 
   public GlobalConfigurationDto getGlobalConfiguration() {
@@ -69,7 +69,7 @@ class ConfigurationService {
 
   public void updateGlobalConfiguration(GlobalConfigurationDto updatedGlobalConfiguration) {
     ConfigurationPermissions.write(Constants.NAME).check();
-    configStore.storeGlobalConfiguration(mapper.map(updatedGlobalConfiguration, configStore.getGlobalConfiguration()));
+    configStore.storeGlobalConfiguration(mapper.map(updatedGlobalConfiguration));
   }
 
   private Repository loadRepository(String namespace, String name) {

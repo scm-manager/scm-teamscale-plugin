@@ -116,13 +116,10 @@ class ConfigurationServiceTest {
 
     @Test
     void shouldUpdateRepositoryConfig() {
-      Configuration oldConfig = new Configuration("hitchhiker.org");
-      when(configStore.getConfiguration(REPOSITORY)).thenReturn(oldConfig);
-
       ConfigurationDto newConfigDto = new ConfigurationDto("scm-manager.org");
       service.updateRepositoryConfiguration(REPOSITORY.getNamespace(), REPOSITORY.getName(), newConfigDto);
 
-      verify(mapper).map(newConfigDto, oldConfig);
+      verify(mapper).map(newConfigDto);
     }
   }
 
@@ -140,13 +137,10 @@ class ConfigurationServiceTest {
 
   @Test
   void shouldUpdateGlobalConfig() {
-    GlobalConfiguration oldConfig = createGlobalConfiguration();
-    when(configStore.getGlobalConfiguration()).thenReturn(oldConfig);
-
     GlobalConfigurationDto newConfigDto = createGlobalConfigurationDto();
     service.updateGlobalConfiguration(newConfigDto);
 
-    verify(mapper).map(newConfigDto, oldConfig);
+    verify(mapper).map(newConfigDto);
   }
 
   @Test

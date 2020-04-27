@@ -52,6 +52,10 @@ public class Notifier {
     this.configurationProvider = configurationProvider;
   }
 
+  public boolean isTeamscaleConfigured(Repository repository) {
+    return configurationProvider.evaluateConfiguration(repository).isPresent();
+  }
+
   public String createRepositoryId(Repository repository) {
     return repository.getNamespace() + "/" + repository.getName();
   }
@@ -79,6 +83,6 @@ public class Notifier {
   }
 
   private String createTeamscaleHookUrl(String url) {
-    return HttpUtil.append(url, "scm-manager-hook");
+    return HttpUtil.append(url, "api/scm-manager/web-hook");
   }
 }

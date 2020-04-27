@@ -137,7 +137,6 @@ public class PullRequestResourceTest {
     verify(pullRequestRootResource).getPullRequestResource();
     verify(reviewPullRequestResource).comments();
     verify(commentRootResource).getCommentResource();
-    verify(commentResource).deleteComment(any(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
 
     assertThat(response.getStatus()).isEqualTo(204);
   }

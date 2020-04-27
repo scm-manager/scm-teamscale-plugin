@@ -51,13 +51,9 @@ class TeamscaleGlobalConfigurationForm extends React.Component<Props, TeamscaleG
           {
             ...this.state
           },
-          this.isStateValid()
+          true
         )
     );
-  };
-
-  isStateValid = () => {
-    return !!this.state.url;
   };
 
   render() {

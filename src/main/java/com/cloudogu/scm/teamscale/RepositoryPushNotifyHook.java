@@ -48,14 +48,16 @@ public class RepositoryPushNotifyHook {
 
   @Subscribe
   public void notify(PostReceiveRepositoryHookEvent event) {
-    if (event.getContext().isFeatureSupported(HookFeature.BRANCH_PROVIDER)) {
-      for (String branchName : getBranchesFromContext(event.getContext())) {
-        PushNotification notification = createPushNotificationWithBranch(event.getRepository(), branchName);
+    if (notifier.isTeamscaleConfigured(event.getRepository())) {
+      if (event.getContext().isFeatureSupported(HookFeature.BRANCH_PROVIDER)) {
+        for (String branchName : getBranchesFromContext(event.getContext())) {
+          PushNotification notification = createPushNotificationWithBranch(event.getRepository(), branchName);
+          notifier.notifyViaHttp(event.getRepository(), notification, PUSH_EVENT);
+        }
+      } else {
+        PushNotification notification = createPushNotification(event.getRepository());
         notifier.notifyViaHttp(event.getRepository(), notification, PUSH_EVENT);
       }
-    } else {
-      PushNotification notification = createPushNotification(event.getRepository());
-      notifier.notifyViaHttp(event.getRepository(), notification, PUSH_EVENT);
     }
   }
 

@@ -71,7 +71,7 @@ class RepositoryPushNotifyHookTest {
 
   @BeforeEach
   void initEvent() {
-    when(event.getContext()).thenReturn(hookContext);
+    lenient().when(event.getContext()).thenReturn(hookContext);
     lenient().when(hookContext.getBranchProvider()).thenReturn(branchProvider);
     lenient().when(event.getRepository()).thenReturn(REPOSITORY);
     lenient().when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
@@ -79,7 +79,17 @@ class RepositoryPushNotifyHookTest {
   }
 
   @Test
+  void shouldNotNotifyIfTeamscaleNotConfigured() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(false);
+
+    hook.notify(event);
+
+    verify(notifier, never()).notifyViaHttp(any(Repository.class), pushNotificationCaptor.capture(), anyString());
+  }
+
+  @Test
   void shouldNotifyWithoutBranchIfBranchProviderNotSupported() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
     when(hookContext.isFeatureSupported(HookFeature.BRANCH_PROVIDER)).thenReturn(false);
 
     hook.notify(event);
@@ -93,6 +103,7 @@ class RepositoryPushNotifyHookTest {
 
   @Test
   void shouldNotTriggerNotificationOnHookWithBranchIfNoBranchesProvided() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
     when(hookContext.isFeatureSupported(HookFeature.BRANCH_PROVIDER)).thenReturn(true);
     when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of());
 
@@ -104,6 +115,7 @@ class RepositoryPushNotifyHookTest {
   @Test
   void shouldTriggerNotificationOnHookWithBranch() {
     String branchName = "feature/teamscaleConfig";
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
     when(hookContext.isFeatureSupported(HookFeature.BRANCH_PROVIDER)).thenReturn(true);
     when(branchProvider.getCreatedOrModified()).thenReturn(ImmutableList.of(branchName));
 

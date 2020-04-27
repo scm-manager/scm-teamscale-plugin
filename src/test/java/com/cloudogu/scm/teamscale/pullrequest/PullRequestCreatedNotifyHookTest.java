@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PullRequestCreatedNotifyHookTest {
@@ -73,9 +74,22 @@ class PullRequestCreatedNotifyHookTest {
   }
 
   @Test
+  void shouldNotNotifyIfTeamscaleNotConfigured() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(false);
+
+    PullRequest pullRequest = new PullRequest();
+    PullRequestEvent event = new PullRequestEvent(REPOSITORY, pullRequest, null, HandlerEventType.CREATE);
+
+    hook.handleEvent(event);
+
+    verify(notifier, never()).notifyViaHttp(any(Repository.class), captor.capture(), anyString());
+  }
+
+  @Test
   void shouldSendNotificationIfPullRequestCreatedEvent() {
-    lenient().when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
-    lenient().when(notifier.createRepositoryUrl(REPOSITORY)).thenReturn(REPOSITORY_URL);
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
+    when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
+    when(notifier.createRepositoryUrl(REPOSITORY)).thenReturn(REPOSITORY_URL);
 
     PullRequest pullRequest = new PullRequest();
     pullRequest.setId("pr-1");
