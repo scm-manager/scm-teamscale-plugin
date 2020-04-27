@@ -5,7 +5,9 @@
       "title": "Teamscale",
       "form": {
         "url": "Instanz-URL",
-        "url-helptext": "Die URL der Teamscale Instanz."
+        "urlHelptext": "Die URL der Teamscale Instanz.",
+        "disableRepositoryConfiguration": "Repository-spezifische Konfiguration verbieten",
+        "disableRepositoryConfigurationHelptext": "Repository-spezifische Konfiguration durch Owner von Repositories verbieten."
       }
     }
   },
