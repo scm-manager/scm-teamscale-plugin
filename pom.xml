@@ -72,6 +72,7 @@
           <resourcePackages>
             <resourcePackage>com.cloudogu.scm.teamscale.config</resourcePackage>
             <resourcePackage>com.cloudogu.scm.teamscale</resourcePackage>
+            <resourcePackage>com.cloudogu.scm.teamscale.pullrequest</resourcePackage>
           </resourcePackages>
         </configuration>
       </plugin>
