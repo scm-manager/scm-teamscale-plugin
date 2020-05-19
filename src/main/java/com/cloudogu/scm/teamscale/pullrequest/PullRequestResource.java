@@ -169,7 +169,7 @@ public class PullRequestResource {
     return pullRequestRootResource
       .getPullRequestResource()
       .comments()
-      .create(namespace, name, pullRequestId, commentId, expectedSourceRevision, expectedTargetRevision, commentDto);
+      .create(namespace, name, pullRequestId, expectedSourceRevision, expectedTargetRevision, commentDto);
   }
 
   @GET
