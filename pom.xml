@@ -32,7 +32,7 @@
   <parent>
     <artifactId>scm-plugins</artifactId>
     <groupId>sonia.scm.plugins</groupId>
-    <version>2.0.0-rc8</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>scm-teamscale-plugin</artifactId>
@@ -52,13 +52,13 @@
     <dependency>
       <groupId>sonia.scm.plugins</groupId>
       <artifactId>scm-ci-plugin</artifactId>
-      <version>2.0.0-rc2</version>
+      <version>2.0.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>sonia.scm.plugins</groupId>
       <artifactId>scm-review-plugin</artifactId>
-      <version>2.0.0-rc9-3</version>
+      <version>2.0.0-SNAPSHOT</version>
       <optional>true</optional>
     </dependency>
   </dependencies>

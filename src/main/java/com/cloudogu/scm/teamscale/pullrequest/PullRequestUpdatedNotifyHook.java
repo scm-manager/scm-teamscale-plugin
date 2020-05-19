@@ -24,11 +24,10 @@
 package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.pullrequest.service.PullRequest;
-import com.cloudogu.scm.review.pullrequest.service.PullRequestEvent;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestUpdatedEvent;
 import com.cloudogu.scm.teamscale.Notifier;
 import com.github.legman.Subscribe;
 import sonia.scm.EagerSingleton;
-import sonia.scm.HandlerEventType;
 import sonia.scm.plugin.Extension;
 import sonia.scm.plugin.Requires;
 import sonia.scm.repository.Repository;
@@ -49,9 +48,9 @@ public class PullRequestUpdatedNotifyHook {
   }
 
   @Subscribe
-  public void handleEvent(PullRequestEvent event) {
-    if (event.getEventType() == HandlerEventType.MODIFY && notifier.isTeamscaleConfigured(event.getRepository())) {
-      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getItem()), EVENT_TYPE);
+  public void handleEvent(PullRequestUpdatedEvent event) {
+    if (notifier.isTeamscaleConfigured(event.getRepository())) {
+      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getPullRequest()), EVENT_TYPE);
     }
   }
 

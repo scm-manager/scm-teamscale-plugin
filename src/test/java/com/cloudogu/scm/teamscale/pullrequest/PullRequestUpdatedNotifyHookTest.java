@@ -25,6 +25,7 @@ package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.pullrequest.service.PullRequest;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestEvent;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestUpdatedEvent;
 import com.cloudogu.scm.teamscale.Notifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,16 +62,6 @@ class PullRequestUpdatedNotifyHookTest {
   @Captor
   private ArgumentCaptor<PullRequestUpdatedNotification> captor;
 
-  @Test
-  void shouldNotSendNotificationIfNotModifyEvent() {
-    PullRequest pullRequest = new PullRequest();
-    pullRequest.setId("pr-1");
-    PullRequestEvent event = new PullRequestEvent(REPOSITORY, pullRequest, null, HandlerEventType.DELETE);
-
-    hook.handleEvent(event);
-
-    verify(notifier, never()).notifyViaHttp(any(Repository.class), captor.capture(), anyString());
-  }
 
   @Test
   void shouldNotNotifyIfTeamscaleNotConfigured() {
@@ -78,7 +69,7 @@ class PullRequestUpdatedNotifyHookTest {
 
     PullRequest pullRequest = new PullRequest();
     pullRequest.setId("pr-1");
-    PullRequestEvent event = new PullRequestEvent(REPOSITORY, pullRequest, null, HandlerEventType.MODIFY);
+    PullRequestUpdatedEvent event = new PullRequestUpdatedEvent(REPOSITORY, pullRequest);
 
     hook.handleEvent(event);
 
@@ -93,7 +84,7 @@ class PullRequestUpdatedNotifyHookTest {
 
     PullRequest pullRequest = new PullRequest();
     pullRequest.setId("pr-1");
-    PullRequestEvent event = new PullRequestEvent(REPOSITORY, pullRequest, null, HandlerEventType.MODIFY);
+    PullRequestUpdatedEvent event = new PullRequestUpdatedEvent(REPOSITORY, pullRequest);
 
     hook.handleEvent(event);
 

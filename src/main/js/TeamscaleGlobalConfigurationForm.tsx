@@ -82,7 +82,7 @@ class TeamscaleGlobalConfigurationForm extends React.Component<Props, TeamscaleG
           {
             ...this.state
           },
-          valid && this.isStateValid()
+          valid
         );
       }
     );
