@@ -33,6 +33,8 @@
       <verbs>
         <verb>read</verb>
         <verb>pull</verb>
+        <verb>teamscale</verb>
+        <verb>readPullRequest</verb>
         <verb>commentPullRequest</verb>
         <verb>readCIStatus</verb>
         <verb>writeCIStatus</verb>

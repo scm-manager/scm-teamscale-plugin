@@ -19,6 +19,14 @@
           "description": "May modify the repository specific Teamscale configuration for all repositories"
         }
       }
+    },
+    "configuration": {
+      "read,write": {
+        "teamscale": {
+          "displayName": "Modify global Teamscale configuration",
+          "description": "May modify the global Teamscale configuration"
+        }
+      }
     }
   },
   "verbs": {
@@ -26,6 +34,14 @@
       "teamscale": {
         "displayName": "configure Teamscale",
         "description": "May modify the repository specific Teamscale configuration"
+      }
+    },
+    "configuration": {
+      "read,write": {
+        "teamscale": {
+          "displayName": "configure Teamscale",
+          "description": "May modify the global Teamscale configuration"
+        }
       }
     }
   }

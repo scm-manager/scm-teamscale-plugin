@@ -19,6 +19,14 @@
           "description": "Darf die repository-spezifische Teamscale Konfiguration verändern"
         }
       }
+    },
+    "configuration": {
+      "read,write" : {
+        "teamscale": {
+          "displayName": "Globale Teamscale Konfiguration ändern",
+          "description": "Darf die globale Teamscale Konfiguration verändern"
+        }
+      }
     }
   },
   "verbs": {
