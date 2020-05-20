@@ -281,13 +281,13 @@ public class PullRequestResource {
       schema = @Schema(implementation = ErrorDto.class)
     )
   )
-  public HalRepresentation getFindings(@Context UriInfo uriInfo,
+  public Response getFindings(@Context UriInfo uriInfo,
                                        @PathParam("namespace") String namespace,
                                        @PathParam("name") String name,
                                        @PathParam("pullRequestId") String pullRequestId) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
     RepositoryPermissions.custom(READ_FINDINGS_PERMISSION, repository).check();
-    return findingsMapper.map(findingsService.getFindings(repository, pullRequestId), repository, pullRequestId);
+    return Response.ok(findingsMapper.map(findingsService.getFindings(repository, pullRequestId), repository, pullRequestId)).build();
   }
 
   @PUT

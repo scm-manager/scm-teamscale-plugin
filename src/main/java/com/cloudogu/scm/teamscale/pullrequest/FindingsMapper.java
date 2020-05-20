@@ -23,7 +23,6 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
-import com.cloudogu.scm.review.pullrequest.service.PullRequest;
 import de.otto.edison.hal.Link;
 import de.otto.edison.hal.Links;
 import org.mapstruct.AfterMapping;
@@ -47,24 +46,24 @@ public abstract class FindingsMapper extends BaseMapper {
   @Inject
   private ScmPathInfoStore scmPathInfoStore;
 
-  public abstract FindingsDto map(Findings findings, Repository repository, String pullRequestId);
+  public abstract FindingsDto map(Findings findings, @Context Repository repository, @Context String pullRequestId);
 
   @AfterMapping
-  public void addLinks(@MappingTarget FindingsDto target, @Context Repository repository, @Context PullRequest pullRequest) {
-    Links.Builder linksBuilder = linkingTo().self(self(repository, pullRequest));
+  public void addLinks(@MappingTarget FindingsDto target, @Context Repository repository, @Context String pullRequestId) {
+    Links.Builder linksBuilder = linkingTo().self(self(repository, pullRequestId));
     if (RepositoryPermissions.custom(WRITE_FINDINGS_PERMISSION, repository).isPermitted()) {
-      linksBuilder.single(Link.link("update", update(repository, pullRequest)));
+      linksBuilder.single(Link.link("update", update(repository, pullRequestId)));
     }
     target.add(linksBuilder.build());
   }
 
-  private String self(Repository repository, PullRequest pullRequest) {
+  private String self(Repository repository, String pullRequestId) {
     LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStore.get(), PullRequestResource.class);
-    return linkBuilder.method("getFindings").parameters(repository.getNamespace(), repository.getName(), pullRequest.getId()).href();
+    return linkBuilder.method("getFindings").parameters(repository.getNamespace(), repository.getName(), pullRequestId).href();
   }
 
-  private String update(Repository repository, PullRequest pullRequest) {
+  private String update(Repository repository, String pullRequestId) {
     LinkBuilder linkBuilder = new LinkBuilder(scmPathInfoStore.get(), PullRequestResource.class);
-    return linkBuilder.method("updateFindings").parameters(repository.getNamespace(), repository.getName(), pullRequest.getId()).href();
+    return linkBuilder.method("updateFindings").parameters(repository.getNamespace(), repository.getName(), pullRequestId).href();
   }
 }

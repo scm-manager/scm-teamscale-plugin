@@ -37,6 +37,14 @@
       "teamscale": {
         "displayName": "configure Teamscale",
         "description": "May modify the repository specific Teamscale configuration"
+      },
+      "readTeamscaleFindings": {
+        "displayName": "read Teamscale findings",
+        "description": "May read the Teamscale findings"
+      },
+      "writeTeamscaleFindings": {
+        "displayName": "modify Teamscale Findings",
+        "description": "May modify the Teamscale findings"
       }
     },
     "configuration": {

@@ -37,6 +37,14 @@
       "teamscale": {
         "displayName": "Teamscale Konfiguration ändern",
         "description": "Darf die Teamscale Konfiguration verändern"
+      },
+      "readTeamscaleFindings": {
+        "displayName": "Teamscale Findings lesen",
+        "description": "Darf die Teamscale Findings lesen"
+      },
+      "writeTeamscaleFindings": {
+        "displayName": "Teamscale Findings ändern",
+        "description": "Darf die Teamscale Findings verändern"
       }
     }
   }

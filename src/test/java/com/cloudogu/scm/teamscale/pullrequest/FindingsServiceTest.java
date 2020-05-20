@@ -23,39 +23,45 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
-import com.google.common.base.Strings;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import sonia.scm.repository.Repository;
-import sonia.scm.store.DataStore;
-import sonia.scm.store.DataStoreFactory;
+import sonia.scm.repository.RepositoryTestData;
+import sonia.scm.store.InMemoryDataStore;
+import sonia.scm.store.InMemoryDataStoreFactory;
 
-import javax.inject.Inject;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FindingsService {
+class FindingsServiceTest {
 
-  private static final String STORE_NAME = "teamscale-findings";
+  private static final Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
 
-  private final DataStoreFactory dataStoreFactory;
+  private FindingsService findingsService;
 
-  @Inject
-  public FindingsService(DataStoreFactory dataStoreFactory) {
-    this.dataStoreFactory = dataStoreFactory;
+  @BeforeEach
+  void initService() {
+    InMemoryDataStore<Findings> dataStore = new InMemoryDataStore();
+    InMemoryDataStoreFactory dataStoreFactory = new InMemoryDataStoreFactory(dataStore);
+    findingsService = new FindingsService(dataStoreFactory);
   }
 
-  public Findings getFindings(Repository repository, String id) {
-    Findings findings = getStore(repository).get(id);
+  @Test
+  void shouldReturnEmptyFindings() {
+    Findings findings = findingsService.getFindings(REPOSITORY, "1");
 
-    if (findings == null || Strings.isNullOrEmpty(findings.getContent())) {
-      return new Findings("");
-    }
-    return findings;
+    assertThat(findings.getContent()).isEqualTo("");
   }
 
-  public void setFindings(Repository repository, String id, String findingsContent) {
-    getStore(repository).put(id, new Findings(findingsContent));
-  }
+  @Test
+  void shouldUpdateFindings() {
+    String content = "teamscale found some criticals";
+    String pullRequestId = "1";
 
-  private DataStore<Findings> getStore(Repository repository) {
-    return dataStoreFactory.withType(Findings.class).withName(STORE_NAME).forRepository(repository).build();
+    findingsService.setFindings(REPOSITORY, pullRequestId, content);
+
+    Findings storedFindings = findingsService.getFindings(REPOSITORY, pullRequestId);
+
+    assertThat(storedFindings.getContent()).isEqualTo(content);
   }
 
 }
