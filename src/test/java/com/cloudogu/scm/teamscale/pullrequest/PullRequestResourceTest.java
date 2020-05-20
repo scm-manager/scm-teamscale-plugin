@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +63,8 @@ public class PullRequestResourceTest {
 
   private final Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
 
-  private static final String MEDIATYPE = VndMediaType.PREFIX + "teamscale_pr" + VndMediaType.SUFFIX;
+  private static final String PR_MEDIATYPE = VndMediaType.PREFIX + "teamscalePullRequest" + VndMediaType.SUFFIX;
+  private static final String FINDINGS_MEDIATYPE = VndMediaType.PREFIX + "teamscaleFindings" + VndMediaType.SUFFIX;
 
   @Mock
   private PullRequestRootResource pullRequestRootResource;
@@ -101,7 +103,7 @@ public class PullRequestResourceTest {
   void shouldGetAllPullRequests() throws URISyntaxException {
     MockHttpRequest request = MockHttpRequest
       .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName())
-      .contentType(MEDIATYPE);
+      .contentType(PR_MEDIATYPE);
 
     MockHttpResponse response = new MockHttpResponse();
 
@@ -115,7 +117,7 @@ public class PullRequestResourceTest {
     when(pullRequestRootResource.getPullRequestResource()).thenReturn(reviewPullRequestResource);
     MockHttpRequest request = MockHttpRequest
       .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1")
-      .contentType(MEDIATYPE);
+      .contentType(PR_MEDIATYPE);
 
     MockHttpResponse response = new MockHttpResponse();
 
@@ -131,7 +133,7 @@ public class PullRequestResourceTest {
     when(reviewPullRequestResource.comments()).thenReturn(commentRootResource);
     MockHttpRequest request = MockHttpRequest
       .get("/v2/teamscale/pull-request/comments/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1")
-      .contentType(MEDIATYPE);
+      .contentType(PR_MEDIATYPE);
 
     MockHttpResponse response = new MockHttpResponse();
 
@@ -149,7 +151,7 @@ public class PullRequestResourceTest {
     when(commentRootResource.getCommentResource()).thenReturn(commentResource);
     MockHttpRequest request = MockHttpRequest
       .delete("/v2/teamscale/pull-request/comments/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/abc")
-      .contentType(MEDIATYPE);
+      .contentType(PR_MEDIATYPE);
 
     MockHttpResponse response = new MockHttpResponse();
 
@@ -172,7 +174,7 @@ public class PullRequestResourceTest {
     MockHttpRequest request = MockHttpRequest
       .post("/v2/teamscale/pull-request/comments/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/abc?sourceRevision=source&targetRevision=target")
       .content(commentJson)
-      .contentType(MEDIATYPE);
+      .contentType(PR_MEDIATYPE);
 
     MockHttpResponse response = new MockHttpResponse();
 
@@ -206,13 +208,14 @@ public class PullRequestResourceTest {
 
       MockHttpRequest request = MockHttpRequest
         .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/findings")
-        .contentType(MEDIATYPE);
+        .contentType(FINDINGS_MEDIATYPE);
 
       MockHttpResponse response = new MockHttpResponse();
 
       restDispatcher.invoke(request, response);
 
-      assertThrows(AuthorizationException.class, () -> subject.checkPermission(permission));
+      assertThat(response.getStatus()).isEqualTo(403);
+      verify(findingsService, never()).getFindings(any(), any());
     }
 
     @Test
@@ -227,13 +230,14 @@ public class PullRequestResourceTest {
       MockHttpRequest request = MockHttpRequest
         .put("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/findings")
         .content(contentJson)
-        .contentType(MEDIATYPE);
+        .contentType(FINDINGS_MEDIATYPE);
 
       MockHttpResponse response = new MockHttpResponse();
 
       restDispatcher.invoke(request, response);
 
-      assertThrows(AuthorizationException.class, () -> subject.checkPermission(permission));
+      assertThat(response.getStatus()).isEqualTo(403);
+      verify(findingsService, never()).setFindings(any(), any(), any());
     }
 
     @Test
@@ -246,7 +250,7 @@ public class PullRequestResourceTest {
 
       MockHttpRequest request = MockHttpRequest
         .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/findings")
-        .contentType(MEDIATYPE);
+        .contentType(FINDINGS_MEDIATYPE);
 
       MockHttpResponse response = new MockHttpResponse();
 
@@ -265,7 +269,7 @@ public class PullRequestResourceTest {
       MockHttpRequest request = MockHttpRequest
         .put("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/findings")
         .content(contentJson)
-        .contentType(MEDIATYPE);
+        .contentType(FINDINGS_MEDIATYPE);
 
       MockHttpResponse response = new MockHttpResponse();
 

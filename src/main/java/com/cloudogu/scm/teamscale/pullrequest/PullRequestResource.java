@@ -74,7 +74,8 @@ public class PullRequestResource {
   private final FindingsService findingsService;
   private final FindingsMapper findingsMapper;
 
-  private static final String MEDIATYPE = VndMediaType.PREFIX + "teamscale_pr" + VndMediaType.SUFFIX;
+  private static final String PR_MEDIATYPE = VndMediaType.PREFIX + "teamscalePullRequest" + VndMediaType.SUFFIX;
+  private static final String FINDINGS_MEDIATYPE = VndMediaType.PREFIX + "teamscaleFindings" + VndMediaType.SUFFIX;
 
   @Inject
   public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper) {
@@ -86,7 +87,7 @@ public class PullRequestResource {
 
   @GET
   @Path("{namespace}/{name}/{pullRequestId}")
-  @Produces(MEDIATYPE)
+  @Produces(PR_MEDIATYPE)
   @Operation(
     summary = "Get pull request",
     description = "Returns a single pull request by id.",
@@ -97,7 +98,7 @@ public class PullRequestResource {
     responseCode = "200",
     description = "success",
     content = @Content(
-      mediaType = MEDIATYPE,
+      mediaType = PR_MEDIATYPE,
       schema = @Schema(implementation = PullRequestDto.class)
     )
   )
@@ -120,7 +121,7 @@ public class PullRequestResource {
 
   @GET
   @Path("{namespace}/{name}/")
-  @Produces(MEDIATYPE)
+  @Produces(PR_MEDIATYPE)
   @Operation(
     summary = "Collection of pull requests",
     description = "Returns a list of pull requests by status.",
@@ -131,7 +132,7 @@ public class PullRequestResource {
     responseCode = "200",
     description = "success",
     content = @Content(
-      mediaType = MEDIATYPE,
+      mediaType = PR_MEDIATYPE,
       schema = @Schema(implementation = HalRepresentation.class)
     )
   )
@@ -154,7 +155,7 @@ public class PullRequestResource {
 
   @POST
   @Path("comments/{namespace}/{name}/{pullRequestId}/{commentId}")
-  @Consumes(MEDIATYPE)
+  @Consumes(PR_MEDIATYPE)
   @Operation(
     summary = "Create pull request comment",
     description = "Creates a new pull request comment.",
@@ -188,7 +189,7 @@ public class PullRequestResource {
 
   @GET
   @Path("comments/{namespace}/{name}/{pullRequestId}")
-  @Produces(MEDIATYPE)
+  @Produces(PR_MEDIATYPE)
   @Operation(
     summary = "Get all pull request comments",
     description = "Returns all pull request comments.",
@@ -199,7 +200,7 @@ public class PullRequestResource {
     responseCode = "200",
     description = "success",
     content = @Content(
-      mediaType = MEDIATYPE,
+      mediaType = PR_MEDIATYPE,
       schema = @Schema(implementation = HalRepresentation.class)
     )
   )
@@ -256,7 +257,7 @@ public class PullRequestResource {
 
   @GET
   @Path("{namespace}/{name}/{pullRequestId}/findings")
-  @Produces(MEDIATYPE)
+  @Produces(FINDINGS_MEDIATYPE)
   @Operation(
     summary = "Get teamscale findings for pull request",
     description = "Returns teamscale findings for pull request.",
@@ -267,7 +268,7 @@ public class PullRequestResource {
     responseCode = "200",
     description = "success",
     content = @Content(
-      mediaType = MEDIATYPE,
+      mediaType = FINDINGS_MEDIATYPE,
       schema = @Schema(implementation = HalRepresentation.class)
     )
   )
@@ -292,7 +293,7 @@ public class PullRequestResource {
 
   @PUT
   @Path("{namespace}/{name}/{pullRequestId}/findings")
-  @Consumes(MEDIATYPE)
+  @Consumes(FINDINGS_MEDIATYPE)
   @Operation(
     summary = "Update teamscale findings for pull request",
     description = "Updates teamscale findings for pull request.",
