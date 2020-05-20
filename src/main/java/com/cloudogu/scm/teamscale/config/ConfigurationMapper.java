@@ -24,7 +24,6 @@
 package com.cloudogu.scm.teamscale.config;
 
 import com.cloudogu.scm.teamscale.Constants;
-import com.google.common.annotations.VisibleForTesting;
 import de.otto.edison.hal.Link;
 import de.otto.edison.hal.Links;
 import org.mapstruct.AfterMapping;

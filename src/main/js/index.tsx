@@ -24,6 +24,8 @@
 import { ConfigurationBinder as cfgBinder } from "@scm-manager/ui-components";
 import TeamscaleRepositoryConfiguration from "./TeamscaleRepositoryConfiguration";
 import TeamscaleGlobalConfiguration from "./TeamscaleGlobalConfiguration";
+import { binder } from "@scm-manager/ui-extensions";
+import Findings from "./Findings";
 
 cfgBinder.bindRepositorySetting(
   "/teamscale",
@@ -33,3 +35,5 @@ cfgBinder.bindRepositorySetting(
 );
 
 cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);
+
+binder.bind("reviewPlugin.pullrequest.userList", Findings)

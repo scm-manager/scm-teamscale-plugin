@@ -25,6 +25,8 @@ package com.cloudogu.scm.teamscale;
 
 public final class Constants {
   public static final String NAME = "teamscale";
+  public static final String READ_FINDINGS_PERMISSION = "readTeamscaleFindings";
+  public static final String WRITE_FINDINGS_PERMISSION = "writeTeamscaleFindings";
   private Constants() {
   }
 }

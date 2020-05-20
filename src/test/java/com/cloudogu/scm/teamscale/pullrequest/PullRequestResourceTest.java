@@ -71,7 +71,7 @@ public class PullRequestResourceTest {
 
   @BeforeEach
   void initDispatcher() {
-    PullRequestResource pullRequestResource = new PullRequestResource(pullRequestRootResource);
+    PullRequestResource pullRequestResource = new PullRequestResource(pullRequestRootResource, findingsService, repositoryManager, findingsMapper);
     restDispatcher = new RestDispatcher();
     restDispatcher.addSingletonResource(pullRequestResource);
   }

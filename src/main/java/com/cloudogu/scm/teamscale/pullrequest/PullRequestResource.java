@@ -36,6 +36,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import sonia.scm.api.v2.resources.ErrorDto;
 import sonia.scm.plugin.Requires;
+import sonia.scm.repository.NamespaceAndName;
+import sonia.scm.repository.Repository;
+import sonia.scm.repository.RepositoryManager;
+import sonia.scm.repository.RepositoryPermissions;
 import sonia.scm.web.VndMediaType;
 
 import javax.inject.Inject;
@@ -46,6 +50,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -53,6 +58,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+
+import static com.cloudogu.scm.teamscale.Constants.READ_FINDINGS_PERMISSION;
+import static com.cloudogu.scm.teamscale.Constants.WRITE_FINDINGS_PERMISSION;
 
 @OpenAPIDefinition(tags = {
   @Tag(name = "Pull Request for Teamscale", description = "Pull request endpoints provided by the teamscale-plugin")
@@ -62,12 +70,18 @@ import javax.ws.rs.core.UriInfo;
 public class PullRequestResource {
 
   private final PullRequestRootResource pullRequestRootResource;
+  private final RepositoryManager repositoryManager;
+  private final FindingsService findingsService;
+  private final FindingsMapper findingsMapper;
 
   private static final String MEDIATYPE = VndMediaType.PREFIX + "teamscale_pr" + VndMediaType.SUFFIX;
 
   @Inject
-  public PullRequestResource(PullRequestRootResource pullRequestRootResource) {
+  public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper) {
     this.pullRequestRootResource = pullRequestRootResource;
+    this.repositoryManager = repositoryManager;
+    this.findingsService = findingsService;
+    this.findingsMapper = findingsMapper;
   }
 
   @GET
@@ -238,5 +252,74 @@ public class PullRequestResource {
       .getCommentResource()
       .deleteComment(uriInfo, namespace, name, pullRequestId, commentId, expectedSourceRevision, expectedTargetRevision);
     return Response.noContent().build();
+  }
+
+  @GET
+  @Path("{namespace}/{name}/{pullRequestId}/findings")
+  @Produces(MEDIATYPE)
+  @Operation(
+    summary = "Get teamscale findings for pull request",
+    description = "Returns teamscale findings for pull request.",
+    tags = "Pull Request for Teamscale",
+    operationId = "teamscale_get_findings"
+  )
+  @ApiResponse(
+    responseCode = "200",
+    description = "success",
+    content = @Content(
+      mediaType = MEDIATYPE,
+      schema = @Schema(implementation = HalRepresentation.class)
+    )
+  )
+  @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
+  @ApiResponse(responseCode = "403", description = "not authorized, the current user does not have the \"readTeamscaleFindings\" privilege")
+  @ApiResponse(
+    responseCode = "500",
+    description = "internal server error",
+    content = @Content(
+      mediaType = VndMediaType.ERROR_TYPE,
+      schema = @Schema(implementation = ErrorDto.class)
+    )
+  )
+  public HalRepresentation getFindings(@Context UriInfo uriInfo,
+                                       @PathParam("namespace") String namespace,
+                                       @PathParam("name") String name,
+                                       @PathParam("pullRequestId") String pullRequestId) {
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+    RepositoryPermissions.custom(READ_FINDINGS_PERMISSION, repository).check();
+    return findingsMapper.map(findingsService.getFindings(repository, pullRequestId), repository, pullRequestId);
+  }
+
+  @PUT
+  @Path("{namespace}/{name}/{pullRequestId}/findings")
+  @Produces(MEDIATYPE)
+  @Operation(
+    summary = "Update teamscale findings for pull request",
+    description = "Updates teamscale findings for pull request.",
+    tags = "Pull Request for Teamscale",
+    operationId = "teamscale_put_findings"
+  )
+  @ApiResponse(
+    responseCode = "204",
+    description = "no content"
+  )
+  @ApiResponse(responseCode = "401", description = "not authenticated / invalid credentials")
+  @ApiResponse(responseCode = "403", description = "not authorized, the current user does not have the \"writeTeamscaleFindings\" privilege")
+  @ApiResponse(
+    responseCode = "500",
+    description = "internal server error",
+    content = @Content(
+      mediaType = VndMediaType.ERROR_TYPE,
+      schema = @Schema(implementation = ErrorDto.class)
+    )
+  )
+  public void updateFindings(@Context UriInfo uriInfo,
+                             @PathParam("namespace") String namespace,
+                             @PathParam("name") String name,
+                             @PathParam("pullRequestId") String pullRequestId,
+                             FindingsDto findingsDto) {
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+    RepositoryPermissions.custom(WRITE_FINDINGS_PERMISSION, repository).check();
+    findingsService.setFindings(repository, pullRequestId, findingsDto.getContent());
   }
 }

@@ -1,5 +1,8 @@
 {
   "scm-teamscale-plugin": {
+    "pullRequest": {
+      "findings": "Teamscale"
+    },
     "config": {
       "link": "Teamscale",
       "title": "Teamscale",
