@@ -199,9 +199,9 @@ public class PullRequestResourceTest {
 
     @Test
     void shouldThrowAuthorizationExceptionIfNotPermittedToRead() throws URISyntaxException {
-      doThrow(AuthorizationException.class).when(subject).checkPermission(anyString());
+      String permission = "repository:readTeamscaleFindings:" + REPOSITORY.getId();
+      doThrow(AuthorizationException.class).when(subject).checkPermission(permission);
 
-      String content = "teamscale findings: 2";
       when(repositoryManager.get(REPOSITORY.getNamespaceAndName())).thenReturn(REPOSITORY);
 
       MockHttpRequest request = MockHttpRequest
@@ -212,12 +212,13 @@ public class PullRequestResourceTest {
 
       restDispatcher.invoke(request, response);
 
-      assertThrows(AuthorizationException.class, () -> subject.checkPermission(anyString()));
+      assertThrows(AuthorizationException.class, () -> subject.checkPermission(permission));
     }
 
     @Test
     void shouldThrowAuthorizationExceptionIfNotPermittedToWrite() throws URISyntaxException {
-      doThrow(AuthorizationException.class).when(subject).checkPermission(anyString());
+      String permission = "repository:writeTeamscaleFindings:" + REPOSITORY.getId();
+      doThrow(AuthorizationException.class).when(subject).checkPermission(permission);
 
       String content = "teamscale findings: 2";
       byte[] contentJson = ("{\"content\" : \"" + content + "\"}").getBytes();
@@ -232,7 +233,7 @@ public class PullRequestResourceTest {
 
       restDispatcher.invoke(request, response);
 
-      assertThrows(AuthorizationException.class, () -> subject.checkPermission(anyString()));
+      assertThrows(AuthorizationException.class, () -> subject.checkPermission(permission));
     }
 
     @Test

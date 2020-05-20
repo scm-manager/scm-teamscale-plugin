@@ -21,6 +21,18 @@
           "displayName": "Modify repository specific Teamscale configuration",
           "description": "May modify the repository specific Teamscale configuration for all repositories"
         }
+      },
+      "readTeamscaleFindings": {
+        "*": {
+          "displayName": "Read Teamscale findings",
+          "description": "May read Teamscale findings for all repositories"
+        }
+      },
+      "writeTeamscaleFindings": {
+        "*": {
+          "displayName": "Modify Teamscale findings",
+          "description": "May modify Teamscale findings for all repositories"
+        }
       }
     },
     "configuration": {
@@ -45,14 +57,6 @@
       "writeTeamscaleFindings": {
         "displayName": "modify Teamscale Findings",
         "description": "May modify the Teamscale findings"
-      }
-    },
-    "configuration": {
-      "read,write": {
-        "teamscale": {
-          "displayName": "configure Teamscale",
-          "description": "May modify the global Teamscale configuration"
-        }
       }
     }
   }

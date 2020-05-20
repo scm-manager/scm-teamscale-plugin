@@ -21,6 +21,18 @@
           "displayName": "Repository-spezifische Teamscale Konfiguration ändern",
           "description": "Darf die repository-spezifische Teamscale Konfiguration verändern"
         }
+      },
+      "readTeamscaleFindings": {
+        "*": {
+          "displayName": "Teamscale Findings lesen",
+          "description": "Darf Teamscale Findings in allen Repositorys lesen"
+        }
+      },
+      "writeTeamscaleFindings": {
+        "*": {
+          "displayName": "Teamscale Findings ändern",
+          "description": "Darf Teamscale Findings für alle Repositorys ändern"
+        }
       }
     },
     "configuration": {

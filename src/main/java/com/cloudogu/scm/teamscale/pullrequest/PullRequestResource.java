@@ -292,7 +292,7 @@ public class PullRequestResource {
 
   @PUT
   @Path("{namespace}/{name}/{pullRequestId}/findings")
-  @Produces(MEDIATYPE)
+  @Consumes(MEDIATYPE)
   @Operation(
     summary = "Update teamscale findings for pull request",
     description = "Updates teamscale findings for pull request.",

@@ -31,6 +31,12 @@
   </verbs>
   <roles>
     <role>
+      <name>READ</name>
+      <verbs>
+        <verb>readTeamscaleFindings</verb>
+      </verbs>
+    </role>
+    <role>
       <name>TEAMSCALE</name>
       <verbs>
         <verb>read</verb>

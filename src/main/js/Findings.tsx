@@ -45,15 +45,18 @@ const Findings: FC<Props> = ({ pullRequest }) => {
   const [t] = useTranslation("plugins");
   const [findings, setFindings] = useState("");
   const [error, setError] = useState<Error | undefined>(undefined);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    apiClient
-      .get((pullRequest._links.teamscaleFindings as Link).href)
-      .then(r => r.json())
-      .then(finding => setFindings(finding.content))
-      .then(() => setLoading(false))
-      .catch(setError);
+    if ((pullRequest?._links?.teamscaleFindings as Link)?.href) {
+      setLoading(true)
+      apiClient
+        .get((pullRequest?._links?.teamscaleFindings as Link)?.href)
+        .then(r => r.json())
+        .then(finding => setFindings(finding.content))
+        .then(() => setLoading(false))
+        .catch(setError);
+    }
   }, [pullRequest]);
 
   if (loading) {
