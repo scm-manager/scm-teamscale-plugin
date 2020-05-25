@@ -172,7 +172,7 @@ public class PullRequestResourceTest {
     byte[] commentJson = "{\"comment\" : \"this is my comment\"}".getBytes();
 
     MockHttpRequest request = MockHttpRequest
-      .post("/v2/teamscale/pull-request/comments/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1/abc?sourceRevision=source&targetRevision=target")
+      .post("/v2/teamscale/pull-request/comments/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1?sourceRevision=source&targetRevision=target")
       .content(commentJson)
       .contentType(PR_MEDIATYPE);
 

@@ -154,7 +154,7 @@ public class PullRequestResource {
   }
 
   @POST
-  @Path("comments/{namespace}/{name}/{pullRequestId}/{commentId}")
+  @Path("comments/{namespace}/{name}/{pullRequestId}")
   @Consumes(PR_MEDIATYPE)
   @Operation(
     summary = "Create pull request comment",
@@ -177,7 +177,6 @@ public class PullRequestResource {
   public Response createComment(@PathParam("namespace") String namespace,
                                 @PathParam("name") String name,
                                 @PathParam("pullRequestId") String pullRequestId,
-                                @PathParam("commentId") String commentId,
                                 @QueryParam("sourceRevision") String expectedSourceRevision,
                                 @QueryParam("targetRevision") String expectedTargetRevision,
                                 @Valid @NotNull CommentDto commentDto) {
