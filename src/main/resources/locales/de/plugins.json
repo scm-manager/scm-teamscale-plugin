@@ -1,5 +1,8 @@
 {
   "scm-teamscale-plugin": {
+    "pullRequest": {
+      "findings": "Teamscale"
+    },
     "config": {
       "link": "Teamscale",
       "title": "Teamscale",
@@ -18,6 +21,26 @@
           "displayName": "Repository-spezifische Teamscale Konfiguration ändern",
           "description": "Darf die repository-spezifische Teamscale Konfiguration verändern"
         }
+      },
+      "readTeamscaleFindings": {
+        "*": {
+          "displayName": "Teamscale Findings lesen",
+          "description": "Darf Teamscale Findings in allen Repositorys lesen"
+        }
+      },
+      "writeTeamscaleFindings": {
+        "*": {
+          "displayName": "Teamscale Findings ändern",
+          "description": "Darf Teamscale Findings für alle Repositorys ändern"
+        }
+      }
+    },
+    "configuration": {
+      "read,write" : {
+        "teamscale": {
+          "displayName": "Globale Teamscale Konfiguration ändern",
+          "description": "Darf die globale Teamscale Konfiguration verändern"
+        }
       }
     }
   },
@@ -26,6 +49,14 @@
       "teamscale": {
         "displayName": "Teamscale Konfiguration ändern",
         "description": "Darf die Teamscale Konfiguration verändern"
+      },
+      "readTeamscaleFindings": {
+        "displayName": "Teamscale Findings lesen",
+        "description": "Darf die Teamscale Findings lesen"
+      },
+      "writeTeamscaleFindings": {
+        "displayName": "Teamscale Findings ändern",
+        "description": "Darf die Teamscale Findings verändern"
       }
     }
   }

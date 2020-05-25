@@ -21,19 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { ConfigurationBinder as cfgBinder } from "@scm-manager/ui-components";
-import TeamscaleRepositoryConfiguration from "./TeamscaleRepositoryConfiguration";
-import TeamscaleGlobalConfiguration from "./TeamscaleGlobalConfiguration";
-import { binder } from "@scm-manager/ui-extensions";
-import Findings from "./Findings";
+package com.cloudogu.scm.teamscale.pullrequest;
 
-cfgBinder.bindRepositorySetting(
-  "/teamscale",
-  "scm-teamscale-plugin.config.link",
-  "teamscaleConfig",
-  TeamscaleRepositoryConfiguration
-);
+import com.google.common.base.Strings;
+import sonia.scm.repository.Repository;
+import sonia.scm.store.DataStore;
+import sonia.scm.store.DataStoreFactory;
 
-cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);
+import javax.inject.Inject;
 
-binder.bind("reviewPlugin.pullrequest.userList", Findings)
+public class FindingsService {
+
+  private static final String STORE_NAME = "teamscale-findings";
+
+  private final DataStoreFactory dataStoreFactory;
+
+  @Inject
+  public FindingsService(DataStoreFactory dataStoreFactory) {
+    this.dataStoreFactory = dataStoreFactory;
+  }
+
+  public Findings getFindings(Repository repository, String id) {
+    Findings findings = getStore(repository).get(id);
+
+    if (findings == null || Strings.isNullOrEmpty(findings.getContent())) {
+      return new Findings("");
+    }
+    return findings;
+  }
+
+  public void setFindings(Repository repository, String id, String findingsContent) {
+    getStore(repository).put(id, new Findings(findingsContent));
+  }
+
+  private DataStore<Findings> getStore(Repository repository) {
+    return dataStoreFactory.withType(Findings.class).withName(STORE_NAME).forRepository(repository).build();
+  }
+
+}

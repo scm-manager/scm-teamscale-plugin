@@ -21,19 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { ConfigurationBinder as cfgBinder } from "@scm-manager/ui-components";
-import TeamscaleRepositoryConfiguration from "./TeamscaleRepositoryConfiguration";
-import TeamscaleGlobalConfiguration from "./TeamscaleGlobalConfiguration";
-import { binder } from "@scm-manager/ui-extensions";
-import Findings from "./Findings";
+package com.cloudogu.scm.teamscale.pullrequest;
 
-cfgBinder.bindRepositorySetting(
-  "/teamscale",
-  "scm-teamscale-plugin.config.link",
-  "teamscaleConfig",
-  TeamscaleRepositoryConfiguration
-);
+import de.otto.edison.hal.HalRepresentation;
+import de.otto.edison.hal.Links;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+public class FindingsDto extends HalRepresentation {
 
-binder.bind("reviewPlugin.pullrequest.userList", Findings)
+  private String content;
+
+  @Override
+  @SuppressWarnings("squid:S1185") // We want to have this method available in this package
+  protected HalRepresentation add(Links links) {
+    return super.add(links);
+  }
+}

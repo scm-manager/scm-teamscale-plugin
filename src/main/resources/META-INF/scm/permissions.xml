@@ -30,4 +30,10 @@
   <permission>
     <value>repository:teamscale:*</value>
   </permission>
+  <permission>
+    <value>repository:readTeamscaleFindings:*</value>
+  </permission>
+  <permission>
+    <value>repository:writeTeamscaleFindings:*</value>
+  </permission>
 </permissions>

@@ -21,19 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { ConfigurationBinder as cfgBinder } from "@scm-manager/ui-components";
-import TeamscaleRepositoryConfiguration from "./TeamscaleRepositoryConfiguration";
-import TeamscaleGlobalConfiguration from "./TeamscaleGlobalConfiguration";
-import { binder } from "@scm-manager/ui-extensions";
-import Findings from "./Findings";
+package com.cloudogu.scm.teamscale.pullrequest;
 
-cfgBinder.bindRepositorySetting(
-  "/teamscale",
-  "scm-teamscale-plugin.config.link",
-  "teamscaleConfig",
-  TeamscaleRepositoryConfiguration
-);
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 
-binder.bind("reviewPlugin.pullrequest.userList", Findings)
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+public class Findings {
+  private String content;
+}

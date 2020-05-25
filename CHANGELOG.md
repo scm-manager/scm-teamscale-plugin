@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- Increase permissions on teamscale permission role
+- Add findings area in pull request view for teamscale findings
+- Trigger Pull-Request-Updated-Event also on new commits on related branches
 
 ## 1.0.0-rc2 - 2020-05-08
 ### Added
