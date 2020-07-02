@@ -55,7 +55,7 @@
         "description": "May read the Teamscale findings"
       },
       "writeTeamscaleFindings": {
-        "displayName": "modify Teamscale Findings",
+        "displayName": "modify Teamscale findings",
         "description": "May modify the Teamscale findings"
       }
     }
