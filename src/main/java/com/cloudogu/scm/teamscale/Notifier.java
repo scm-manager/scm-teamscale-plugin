@@ -74,6 +74,7 @@ public class Notifier {
     try {
       client
         .post(createTeamscaleHookUrl(configuration.getUrl()))
+        .spanKind("Teamscale")
         .jsonContent(notification)
         .header("X-SCM-Event", eventType)
         .request();
