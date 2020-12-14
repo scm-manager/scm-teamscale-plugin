@@ -26,7 +26,7 @@
 <repository-permissions>
   <verbs>
     <verb>teamscale</verb>
-    <verb>readTeamscaleFindings</verb>
+    <verb read-only="true">readTeamscaleFindings</verb>
     <verb>writeTeamscaleFindings</verb>
   </verbs>
   <roles>
