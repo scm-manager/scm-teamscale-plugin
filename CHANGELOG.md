@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 ### Added
-- Mark read only verbs to be able to see pull requests in archived repositories ([#8](https://github.com/scm-manager/scm-teamscale-plugin/pull/8))
+- Mark read only verbs to be able to see teamscale findings in archived repositories ([#8](https://github.com/scm-manager/scm-teamscale-plugin/pull/8))
 
 ## 1.1.0 - 2020-09-11
 ### Changed
