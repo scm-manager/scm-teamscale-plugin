@@ -36,7 +36,7 @@
   </parent>
 
   <artifactId>scm-teamscale-plugin</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
+  <version>1.2.0</version>
   <name>scm-teamscale-plugin</name>
   <packaging>smp</packaging>
   <url>https://github.com/scm-manager/scm-teamscale-plugin</url>
