@@ -23,7 +23,7 @@
  */
 import React from "react";
 import { WithTranslation, withTranslation } from "react-i18next";
-import { Subtitle, Configuration } from "@scm-manager/ui-components";
+import { Title, Configuration } from "@scm-manager/ui-components";
 import TeamscaleGlobalConfigurationForm from "./TeamscaleGlobalConfigurationForm";
 
 type Props = WithTranslation & {
@@ -36,7 +36,7 @@ class TeamscaleGlobalConfiguration extends React.Component<Props> {
 
     return (
       <>
-        <Subtitle subtitle={t("scm-teamscale-plugin.config.title")} />
+        <Title title={t("scm-teamscale-plugin.config.title")} />
         <Configuration link={link} render={props => <TeamscaleGlobalConfigurationForm {...props} />} />
       </>
     );
