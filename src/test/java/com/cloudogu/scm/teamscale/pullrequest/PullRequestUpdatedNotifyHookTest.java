@@ -24,7 +24,10 @@
 package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.pullrequest.service.PullRequest;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestEmergencyMergedEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestEvent;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestMergedEvent;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestRejectedEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestUpdatedEvent;
 import com.cloudogu.scm.teamscale.Notifier;
 import org.junit.jupiter.api.Test;
@@ -85,6 +88,66 @@ class PullRequestUpdatedNotifyHookTest {
     PullRequest pullRequest = new PullRequest();
     pullRequest.setId("pr-1");
     PullRequestUpdatedEvent event = new PullRequestUpdatedEvent(REPOSITORY, pullRequest);
+
+    hook.handleEvent(event);
+
+    verify(notifier).notifyViaHttp(any(Repository.class), captor.capture(), anyString());
+
+    PullRequestUpdatedNotification notification = captor.getValue();
+    assertThat(notification.getRepositoryUrl()).isEqualTo(REPOSITORY_URL);
+    assertThat(notification.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
+    assertThat(notification.getPullRequestId()).isEqualTo(pullRequest.getId());
+  }
+
+  @Test
+  void shouldSendNotificationIfPullRequestMergedEvent() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
+    when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
+    when(notifier.createRepositoryUrl(REPOSITORY)).thenReturn(REPOSITORY_URL);
+
+    PullRequest pullRequest = new PullRequest();
+    pullRequest.setId("pr-1");
+    PullRequestMergedEvent event = new PullRequestMergedEvent(REPOSITORY, pullRequest);
+
+    hook.handleEvent(event);
+
+    verify(notifier).notifyViaHttp(any(Repository.class), captor.capture(), anyString());
+
+    PullRequestUpdatedNotification notification = captor.getValue();
+    assertThat(notification.getRepositoryUrl()).isEqualTo(REPOSITORY_URL);
+    assertThat(notification.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
+    assertThat(notification.getPullRequestId()).isEqualTo(pullRequest.getId());
+  }
+
+  @Test
+  void shouldSendNotificationIfPullRequestEmergencyMergedEvent() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
+    when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
+    when(notifier.createRepositoryUrl(REPOSITORY)).thenReturn(REPOSITORY_URL);
+
+    PullRequest pullRequest = new PullRequest();
+    pullRequest.setId("pr-1");
+    PullRequestEmergencyMergedEvent event = new PullRequestEmergencyMergedEvent(REPOSITORY, pullRequest);
+
+    hook.handleEvent(event);
+
+    verify(notifier).notifyViaHttp(any(Repository.class), captor.capture(), anyString());
+
+    PullRequestUpdatedNotification notification = captor.getValue();
+    assertThat(notification.getRepositoryUrl()).isEqualTo(REPOSITORY_URL);
+    assertThat(notification.getRepositoryId()).isEqualTo(NAMESPACE_AND_NAME);
+    assertThat(notification.getPullRequestId()).isEqualTo(pullRequest.getId());
+  }
+
+  @Test
+  void shouldSendNotificationIfPullRequestRejectedEvent() {
+    when(notifier.isTeamscaleConfigured(REPOSITORY)).thenReturn(true);
+    when(notifier.createRepositoryId(REPOSITORY)).thenReturn(NAMESPACE_AND_NAME);
+    when(notifier.createRepositoryUrl(REPOSITORY)).thenReturn(REPOSITORY_URL);
+
+    PullRequest pullRequest = new PullRequest();
+    pullRequest.setId("pr-1");
+    PullRequestRejectedEvent event = new PullRequestRejectedEvent(REPOSITORY, pullRequest, PullRequestRejectedEvent.RejectionCause.REJECTED_BY_USER);
 
     hook.handleEvent(event);
 
