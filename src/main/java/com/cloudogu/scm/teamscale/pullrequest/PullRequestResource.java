@@ -23,6 +23,7 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
+import com.cloudogu.scm.review.BranchResolver;
 import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
@@ -73,16 +74,18 @@ public class PullRequestResource {
   private final RepositoryManager repositoryManager;
   private final FindingsService findingsService;
   private final FindingsMapper findingsMapper;
+  private final BranchResolver branchResolver;
 
   private static final String PR_MEDIATYPE = VndMediaType.PREFIX + "teamscalePullRequest" + VndMediaType.SUFFIX;
   private static final String FINDINGS_MEDIATYPE = VndMediaType.PREFIX + "teamscaleFindings" + VndMediaType.SUFFIX;
 
   @Inject
-  public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper) {
+  public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper, BranchResolver branchResolver) {
     this.pullRequestRootResource = pullRequestRootResource;
     this.repositoryManager = repositoryManager;
     this.findingsService = findingsService;
     this.findingsMapper = findingsMapper;
+    this.branchResolver = branchResolver;
   }
 
   @GET
@@ -116,7 +119,13 @@ public class PullRequestResource {
                                              @PathParam("namespace") String namespace,
                                              @PathParam("name") String name,
                                              @PathParam("pullRequestId") String pullRequestId) {
-    return pullRequestRootResource.getPullRequestResource().get(uriInfo, namespace, name, pullRequestId);
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+    PullRequestDto dto = pullRequestRootResource.getPullRequestResource().get(uriInfo, namespace, name, pullRequestId);
+
+    dto.setSourceRevision(branchResolver.resolve(repository, dto.getSource()).getRevision());
+    dto.setTargetRevision(branchResolver.resolve(repository, dto.getTarget()).getRevision());
+
+    return dto;
   }
 
   @GET
