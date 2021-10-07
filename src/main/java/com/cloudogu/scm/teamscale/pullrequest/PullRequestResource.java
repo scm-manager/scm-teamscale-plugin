@@ -28,6 +28,7 @@ import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
+import com.google.common.base.Strings;
 import de.otto.edison.hal.HalRepresentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -121,9 +122,7 @@ public class PullRequestResource {
                                              @PathParam("pullRequestId") String pullRequestId) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
     PullRequestDto dto = pullRequestRootResource.getPullRequestResource().get(uriInfo, namespace, name, pullRequestId);
-
-    dto.setSourceRevision(branchResolver.resolve(repository, dto.getSource()).getRevision());
-    dto.setTargetRevision(branchResolver.resolve(repository, dto.getTarget()).getRevision());
+    setPullRequestBranchRevisions(repository, dto);
 
     return dto;
   }
@@ -159,7 +158,25 @@ public class PullRequestResource {
                                               @PathParam("namespace") String namespace,
                                               @PathParam("name") String name,
                                               @QueryParam("status") @DefaultValue("OPEN") PullRequestSelector pullRequestSelector) {
-    return pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+
+    HalRepresentation pullRequests = pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+
+    pullRequests.getEmbedded().getItemsBy("pullRequests").forEach(embeddedPr -> {
+      setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr);
+    });
+
+    return pullRequests;
+
+  }
+
+  private void setPullRequestBranchRevisions(Repository repository, PullRequestDto embeddedPr) {
+    if (Strings.isNullOrEmpty(embeddedPr.getSourceRevision())) {
+      embeddedPr.setSourceRevision(branchResolver.resolve(repository, embeddedPr.getSource()).getRevision());
+    }
+    if (Strings.isNullOrEmpty(embeddedPr.getTargetRevision())) {
+      embeddedPr.setTargetRevision(branchResolver.resolve(repository, embeddedPr.getTarget()).getRevision());
+    }
   }
 
   @POST
