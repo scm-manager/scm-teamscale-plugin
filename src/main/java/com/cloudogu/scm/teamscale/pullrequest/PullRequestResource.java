@@ -23,10 +23,12 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
+import com.cloudogu.scm.review.BranchResolver;
 import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
+import com.google.common.base.Strings;
 import de.otto.edison.hal.HalRepresentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,16 +75,18 @@ public class PullRequestResource {
   private final RepositoryManager repositoryManager;
   private final FindingsService findingsService;
   private final FindingsMapper findingsMapper;
+  private final BranchResolver branchResolver;
 
   private static final String PR_MEDIATYPE = VndMediaType.PREFIX + "teamscalePullRequest" + VndMediaType.SUFFIX;
   private static final String FINDINGS_MEDIATYPE = VndMediaType.PREFIX + "teamscaleFindings" + VndMediaType.SUFFIX;
 
   @Inject
-  public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper) {
+  public PullRequestResource(PullRequestRootResource pullRequestRootResource, RepositoryManager repositoryManager, FindingsService findingsService, FindingsMapper findingsMapper, BranchResolver branchResolver) {
     this.pullRequestRootResource = pullRequestRootResource;
     this.repositoryManager = repositoryManager;
     this.findingsService = findingsService;
     this.findingsMapper = findingsMapper;
+    this.branchResolver = branchResolver;
   }
 
   @GET
@@ -116,7 +120,11 @@ public class PullRequestResource {
                                              @PathParam("namespace") String namespace,
                                              @PathParam("name") String name,
                                              @PathParam("pullRequestId") String pullRequestId) {
-    return pullRequestRootResource.getPullRequestResource().get(uriInfo, namespace, name, pullRequestId);
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+    PullRequestDto dto = pullRequestRootResource.getPullRequestResource().get(uriInfo, namespace, name, pullRequestId);
+    setPullRequestBranchRevisions(repository, dto);
+
+    return dto;
   }
 
   @GET
@@ -150,7 +158,25 @@ public class PullRequestResource {
                                               @PathParam("namespace") String namespace,
                                               @PathParam("name") String name,
                                               @QueryParam("status") @DefaultValue("OPEN") PullRequestSelector pullRequestSelector) {
-    return pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+    Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
+
+    HalRepresentation pullRequests = pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+
+    pullRequests.getEmbedded().getItemsBy("pullRequests").forEach(embeddedPr -> {
+      setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr);
+    });
+
+    return pullRequests;
+
+  }
+
+  private void setPullRequestBranchRevisions(Repository repository, PullRequestDto embeddedPr) {
+    if (Strings.isNullOrEmpty(embeddedPr.getSourceRevision())) {
+      embeddedPr.setSourceRevision(branchResolver.resolve(repository, embeddedPr.getSource()).getRevision());
+    }
+    if (Strings.isNullOrEmpty(embeddedPr.getTargetRevision())) {
+      embeddedPr.setTargetRevision(branchResolver.resolve(repository, embeddedPr.getTarget()).getRevision());
+    }
   }
 
   @POST

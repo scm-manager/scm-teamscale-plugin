@@ -23,10 +23,14 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
+import com.cloudogu.scm.review.BranchResolver;
+import com.cloudogu.scm.review.HalRepresentations;
 import com.cloudogu.scm.review.comment.api.CommentResource;
 import com.cloudogu.scm.review.comment.api.CommentRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
+import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
+import com.google.common.collect.ImmutableList;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -39,6 +43,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import sonia.scm.repository.Branch;
 import sonia.scm.repository.Repository;
 import sonia.scm.repository.RepositoryManager;
 import sonia.scm.repository.RepositoryTestData;
@@ -50,7 +55,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -59,7 +63,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PullRequestResourceTest {
+class PullRequestResourceTest {
 
   private final Repository REPOSITORY = RepositoryTestData.createHeartOfGold();
 
@@ -68,24 +72,20 @@ public class PullRequestResourceTest {
 
   @Mock
   private PullRequestRootResource pullRequestRootResource;
-
   @Mock
   private com.cloudogu.scm.review.pullrequest.api.PullRequestResource reviewPullRequestResource;
-
   @Mock
   private FindingsService findingsService;
-
   @Mock
   private RepositoryManager repositoryManager;
-
   @Mock
   private FindingsMapper findingsMapper;
-
   @Mock
   private CommentRootResource commentRootResource;
-
   @Mock
   private CommentResource commentResource;
+  @Mock
+  private BranchResolver branchResolver;
 
   @Mock
   private Subject subject;
@@ -94,27 +94,58 @@ public class PullRequestResourceTest {
 
   @BeforeEach
   void initDispatcher() {
-    PullRequestResource pullRequestResource = new PullRequestResource(pullRequestRootResource, repositoryManager, findingsService, findingsMapper);
+    PullRequestResource pullRequestResource = new PullRequestResource(pullRequestRootResource, repositoryManager, findingsService, findingsMapper, branchResolver);
     restDispatcher = new RestDispatcher();
     restDispatcher.addSingletonResource(pullRequestResource);
   }
 
   @Test
-  void shouldGetAllPullRequests() throws URISyntaxException {
+  void shouldGetAllPullRequestsWithSourceAndTargetRevisions() throws URISyntaxException, UnsupportedEncodingException {
     MockHttpRequest request = MockHttpRequest
       .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName())
       .contentType(PR_MEDIATYPE);
+    when(repositoryManager.get(REPOSITORY.getNamespaceAndName())).thenReturn(REPOSITORY);
+    when(branchResolver.resolve(REPOSITORY, "source")).thenReturn(Branch.normalBranch("develop", "123456"));
+    when(branchResolver.resolve(REPOSITORY, "target")).thenReturn(Branch.normalBranch("master", "987654"));
+
+    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class)))
+      .thenReturn(HalRepresentations.createCollection(
+        true,
+        "self",
+        "create",
+        ImmutableList.of(
+          createPullRequestDto("1", "source", "target"),
+          createPullRequestDto("2", "target", "source")),
+        "pullRequests")
+      );
 
     MockHttpResponse response = new MockHttpResponse();
 
     restDispatcher.invoke(request, response);
 
     verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class));
+
+    assertThat(response.getContentAsString())
+      .contains("\"sourceRevision\":\"987654\",\"targetRevision\":\"123456\"")
+      .contains("\"sourceRevision\":\"123456\",\"targetRevision\":\"987654\"");
+  }
+
+  private PullRequestDto createPullRequestDto(String id, String source, String target) {
+    PullRequestDto dto = new PullRequestDto();
+    dto.setSource(source);
+    dto.setTarget(target);
+    dto.setId(id);
+    return dto;
   }
 
   @Test
-  void shouldGetSinglePullRequest() throws URISyntaxException {
+  void shouldGetSinglePullRequest() throws URISyntaxException, UnsupportedEncodingException {
     when(pullRequestRootResource.getPullRequestResource()).thenReturn(reviewPullRequestResource);
+    PullRequestDto pullRequestDto = createPullRequestDto("1","develop", "master");
+    when(reviewPullRequestResource.get(any(), anyString(), anyString(), anyString())).thenReturn(pullRequestDto);
+    when(repositoryManager.get(REPOSITORY.getNamespaceAndName())).thenReturn(REPOSITORY);
+    when(branchResolver.resolve(REPOSITORY, "develop")).thenReturn(Branch.normalBranch("develop", "123456"));
+    when(branchResolver.resolve(REPOSITORY, "master")).thenReturn(Branch.normalBranch("master", "987654"));
     MockHttpRequest request = MockHttpRequest
       .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1")
       .contentType(PR_MEDIATYPE);
@@ -124,7 +155,29 @@ public class PullRequestResourceTest {
     restDispatcher.invoke(request, response);
 
     verify(pullRequestRootResource).getPullRequestResource();
-    verify(reviewPullRequestResource).get(any(UriInfo.class), anyString(), anyString(), anyString());
+
+    assertThat(response.getContentAsString()).contains("\"sourceRevision\":\"123456\",\"targetRevision\":\"987654\"");
+  }
+
+  @Test
+  void shouldGetSinglePullRequestWithSourceBranchDeleted() throws URISyntaxException, UnsupportedEncodingException {
+    when(pullRequestRootResource.getPullRequestResource()).thenReturn(reviewPullRequestResource);
+    PullRequestDto pullRequestDto = createPullRequestDto("1","develop", "master");
+    pullRequestDto.setSourceRevision("555888");
+    pullRequestDto.setTargetRevision("424242");
+    when(reviewPullRequestResource.get(any(), anyString(), anyString(), anyString())).thenReturn(pullRequestDto);
+    when(repositoryManager.get(REPOSITORY.getNamespaceAndName())).thenReturn(REPOSITORY);
+    MockHttpRequest request = MockHttpRequest
+      .get("/v2/teamscale/pull-request/" + REPOSITORY.getNamespace() + "/" + REPOSITORY.getName() + "/1")
+      .contentType(PR_MEDIATYPE);
+
+    MockHttpResponse response = new MockHttpResponse();
+
+    restDispatcher.invoke(request, response);
+
+    verify(pullRequestRootResource).getPullRequestResource();
+
+    assertThat(response.getContentAsString()).contains("\"sourceRevision\":\"555888\",\"targetRevision\":\"424242\"");
   }
 
   @Test
