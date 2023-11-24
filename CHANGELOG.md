@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.3.1 - 2023-11-24
+### Fixed
+- Dependency to review plugin version 2.29.0
+
 ## 1.3.0 - 2021-10-12
 ### Changed
 - Always provide source and target revision for pull request [#23](https://github.com/scm-manager/scm-teamscale-plugin/pull/23)
@@ -28,11 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - webhooks to notify teamscale about new /changed pull requests
 - provide new pull request rest endpoint for teamscale
 
-## 1.0.0-rc1
-
+## 1.0.0-rc1 - 2020-03-31
 ### Added
 - global and repository specific configuration
 - webhook to notify configured teamscale instance about new commit
 
 ### Changed
 - Changeover to MIT license ([#1](https://github.com/scm-manager/scm-teamscale-plugin/pull/1))
+
