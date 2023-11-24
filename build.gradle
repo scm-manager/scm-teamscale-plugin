@@ -23,17 +23,17 @@
  */
 
 plugins {
-  id 'org.scm-manager.smp' version '0.10.1'
+  id 'org.scm-manager.smp' version '0.15.0'
 }
 
 dependencies {
   plugin "sonia.scm.plugins:scm-ci-plugin:2.0.0"
   optionalPlugin "sonia.scm.plugins:scm-mail-plugin:2.1.0"
-  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.0.0"
+  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.29.0"
 }
 
 scmPlugin {
-  scmVersion = "2.9.0"
+  scmVersion = "2.46.0"
   displayName = "Teamscale"
   description = "Integrates Teamscale to SCM-Manager"
   author = "Cloudogu GmbH"

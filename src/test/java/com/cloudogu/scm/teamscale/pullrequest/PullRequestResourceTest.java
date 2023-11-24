@@ -24,13 +24,16 @@
 package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.BranchResolver;
-import com.cloudogu.scm.review.HalRepresentations;
 import com.cloudogu.scm.review.comment.api.CommentResource;
 import com.cloudogu.scm.review.comment.api.CommentRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
 import com.google.common.collect.ImmutableList;
+import de.otto.edison.hal.Embedded;
+import de.otto.edison.hal.HalRepresentation;
+import de.otto.edison.hal.Link;
+import de.otto.edison.hal.Links;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -50,9 +53,11 @@ import sonia.scm.repository.RepositoryTestData;
 import sonia.scm.web.RestDispatcher;
 import sonia.scm.web.VndMediaType;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -108,22 +113,22 @@ class PullRequestResourceTest {
     when(branchResolver.resolve(REPOSITORY, "source")).thenReturn(Branch.normalBranch("develop", "123456"));
     when(branchResolver.resolve(REPOSITORY, "target")).thenReturn(Branch.normalBranch("master", "987654"));
 
-    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class)))
-      .thenReturn(HalRepresentations.createCollection(
+    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any()))
+      .thenReturn(Response.ok(HalRepresentations.createCollection(
         true,
         "self",
         "create",
         ImmutableList.of(
           createPullRequestDto("1", "source", "target"),
           createPullRequestDto("2", "target", "source")),
-        "pullRequests")
+        "pullRequests")).build()
       );
 
     MockHttpResponse response = new MockHttpResponse();
 
     restDispatcher.invoke(request, response);
 
-    verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class));
+    verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any());
 
     assertThat(response.getContentAsString())
       .contains("\"sourceRevision\":\"987654\",\"targetRevision\":\"123456\"")
@@ -332,5 +337,26 @@ class PullRequestResourceTest {
       assertThat(response.getStatus()).isEqualTo(204);
     }
   }
-}
 
+  static class HalRepresentations {
+
+    private HalRepresentations() {
+    }
+
+    public static HalRepresentation createCollection(
+      boolean permittedToCreate,
+      String selfLink,
+      String createLink,
+      List<? extends HalRepresentation> dtoList, String attributeName
+    ) {
+      Links.Builder builder = Links.linkingTo().self(selfLink);
+
+      if (permittedToCreate) {
+        builder.single(Link.link("create", createLink));
+      }
+
+      return new HalRepresentation(builder.build(), Embedded.embedded(attributeName, dtoList));
+    }
+
+  }
+}

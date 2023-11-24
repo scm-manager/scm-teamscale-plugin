@@ -27,6 +27,7 @@ import com.cloudogu.scm.review.BranchResolver;
 import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
+import com.cloudogu.scm.review.pullrequest.api.PullRequestSortSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
 import com.google.common.base.Strings;
 import de.otto.edison.hal.HalRepresentation;
@@ -160,11 +161,21 @@ public class PullRequestResource {
                                               @QueryParam("status") @DefaultValue("OPEN") PullRequestSelector pullRequestSelector) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
 
-    HalRepresentation pullRequests = pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+    HalRepresentation pullRequests = pullRequestRootResource
+      .getAll(
+        uriInfo,
+        namespace,
+        name,
+        pullRequestSelector,
+        PullRequestSortSelector.ID_ASC)
+      .readEntity(HalRepresentation.class);
 
-    pullRequests.getEmbedded().getItemsBy("pullRequests").forEach(embeddedPr -> {
-      setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr);
-    });
+    pullRequests
+      .getEmbedded()
+      .getItemsBy("pullRequests")
+      .forEach(embeddedPr ->
+        setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr)
+      );
 
     return pullRequests;
 
@@ -308,9 +319,9 @@ public class PullRequestResource {
     )
   )
   public Response getFindings(@Context UriInfo uriInfo,
-                                       @PathParam("namespace") String namespace,
-                                       @PathParam("name") String name,
-                                       @PathParam("pullRequestId") String pullRequestId) {
+                              @PathParam("namespace") String namespace,
+                              @PathParam("name") String name,
+                              @PathParam("pullRequestId") String pullRequestId) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
     RepositoryPermissions.custom(READ_FINDINGS_PERMISSION, repository).check();
     return Response.ok(findingsMapper.map(findingsService.getFindings(repository, pullRequestId), repository, pullRequestId)).build();
