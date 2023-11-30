@@ -29,11 +29,11 @@ plugins {
 dependencies {
   plugin "sonia.scm.plugins:scm-ci-plugin:2.0.0"
   optionalPlugin "sonia.scm.plugins:scm-mail-plugin:2.1.0"
-  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.29.0"
+  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.32.1-SNAPSHOT"
 }
 
 scmPlugin {
-  scmVersion = "2.46.0"
+  scmVersion = "2.48.0"
   displayName = "Teamscale"
   description = "Integrates Teamscale to SCM-Manager"
   author = "Cloudogu GmbH"

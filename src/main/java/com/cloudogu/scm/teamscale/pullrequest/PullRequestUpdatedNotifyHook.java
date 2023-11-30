@@ -23,10 +23,12 @@
  */
 package com.cloudogu.scm.teamscale.pullrequest;
 
+import com.cloudogu.scm.review.pullrequest.service.BasicPullRequestEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequest;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestEmergencyMergedEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestMergedEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestRejectedEvent;
+import com.cloudogu.scm.review.pullrequest.service.PullRequestReopenedEvent;
 import com.cloudogu.scm.review.pullrequest.service.PullRequestUpdatedEvent;
 import com.cloudogu.scm.teamscale.Notifier;
 import com.github.legman.Subscribe;
@@ -52,27 +54,30 @@ public class PullRequestUpdatedNotifyHook {
 
   @Subscribe
   public void handleEvent(PullRequestUpdatedEvent event) {
-    if (notifier.isTeamscaleConfigured(event.getRepository())) {
-      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getPullRequest()), EVENT_TYPE);
-    }
+    handleBaseEvent(event);
   }
 
   @Subscribe
   public void handleEvent(PullRequestMergedEvent event) {
-    if (notifier.isTeamscaleConfigured(event.getRepository())) {
-      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getPullRequest()), EVENT_TYPE);
-    }
+    handleBaseEvent(event);
   }
 
   @Subscribe
   public void handleEvent(PullRequestEmergencyMergedEvent event) {
-    if (notifier.isTeamscaleConfigured(event.getRepository())) {
-      notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getPullRequest()), EVENT_TYPE);
-    }
+    handleBaseEvent(event);
   }
 
   @Subscribe
   public void handleEvent(PullRequestRejectedEvent event) {
+    handleBaseEvent(event);
+  }
+
+  @Subscribe
+  public void handleEvent(PullRequestReopenedEvent event) {
+    handleBaseEvent(event);
+  }
+
+  private void handleBaseEvent(BasicPullRequestEvent event) {
     if (notifier.isTeamscaleConfigured(event.getRepository())) {
       notifier.notifyViaHttp(event.getRepository(), createPullRequestUpdatedNotification(event.getRepository(), event.getPullRequest()), EVENT_TYPE);
     }
