@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.4.0 - 2024-01-17
+### Added
+- Handle reopened pull requests
+
 ## 1.3.1 - 2023-11-24
 ### Fixed
 - Dependency to review plugin version 2.29.0

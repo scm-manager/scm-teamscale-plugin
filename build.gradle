@@ -29,7 +29,7 @@ plugins {
 dependencies {
   plugin "sonia.scm.plugins:scm-ci-plugin:2.0.0"
   optionalPlugin "sonia.scm.plugins:scm-mail-plugin:2.1.0"
-  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.32.1-SNAPSHOT"
+  optionalPlugin "sonia.scm.plugins:scm-review-plugin:2.33.0"
 }
 
 scmPlugin {
