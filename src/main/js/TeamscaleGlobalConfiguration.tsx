@@ -14,26 +14,26 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-import React from "react";
-import { WithTranslation, withTranslation } from "react-i18next";
+import React, {FC} from "react";
+import { useTranslation } from "react-i18next";
 import { Title, Configuration } from "@scm-manager/ui-components";
 import TeamscaleGlobalConfigurationForm from "./TeamscaleGlobalConfigurationForm";
+import { useDocumentTitle } from "@scm-manager/ui-core";
 
-type Props = WithTranslation & {
+type Props = {
   link: string;
 };
 
-class TeamscaleGlobalConfiguration extends React.Component<Props> {
-  render() {
-    const { link, t } = this.props;
+const TeamscaleGlobalConfiguration: FC<Props> = ({ link }) => {
+  const [t] = useTranslation("plugins");
+  useDocumentTitle(t("scm-teamscale-plugin.config.link"));
 
-    return (
-      <>
-        <Title title={t("scm-teamscale-plugin.config.title")} />
-        <Configuration link={link} render={props => <TeamscaleGlobalConfigurationForm {...props} />} />
-      </>
-    );
-  }
+  return (
+    <>
+      <Title title={t("scm-teamscale-plugin.config.title")} />
+      <Configuration link={link} render={props => <TeamscaleGlobalConfigurationForm {...props} />} />
+    </>
+  );
 }
 
-export default withTranslation("plugins")(TeamscaleGlobalConfiguration);
+export default TeamscaleGlobalConfiguration;
