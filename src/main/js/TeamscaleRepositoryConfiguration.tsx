@@ -14,21 +14,17 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-import React, {FC} from "react";
+import React, { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { Subtitle, Configuration } from "@scm-manager/ui-components";
 import ConfigurationForm from "./TeamscaleRepositoryConfigurationForm";
-import { useDocumentTitleForRepository } from "@scm-manager/ui-core";
-import { Repository } from "@scm-manager/ui-types";
 
 type Props = {
   link: string;
-  repository: Repository;
 };
 
-const TeamscaleRepositoryConfiguration: FC<Props> = ({ link, repository }) => {
+const TeamscaleRepositoryConfiguration: FC<Props> = ({ link }) => {
   const [t] = useTranslation("plugins");
-  useDocumentTitleForRepository(repository, t("scm-teamscale-plugin.config.link"));
 
   return (
     <>

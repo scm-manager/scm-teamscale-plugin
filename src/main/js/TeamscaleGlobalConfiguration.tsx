@@ -14,11 +14,10 @@
  * along with this program. If not, see https://www.gnu.org/licenses/.
  */
 
-import React, {FC} from "react";
+import React, { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { Title, Configuration } from "@scm-manager/ui-components";
 import TeamscaleGlobalConfigurationForm from "./TeamscaleGlobalConfigurationForm";
-import { useDocumentTitle } from "@scm-manager/ui-core";
 
 type Props = {
   link: string;
@@ -26,7 +25,6 @@ type Props = {
 
 const TeamscaleGlobalConfiguration: FC<Props> = ({ link }) => {
   const [t] = useTranslation("plugins");
-  useDocumentTitle(t("scm-teamscale-plugin.config.link"));
 
   return (
     <>
@@ -34,6 +32,6 @@ const TeamscaleGlobalConfiguration: FC<Props> = ({ link }) => {
       <Configuration link={link} render={props => <TeamscaleGlobalConfigurationForm {...props} />} />
     </>
   );
-}
+};
 
 export default TeamscaleGlobalConfiguration;

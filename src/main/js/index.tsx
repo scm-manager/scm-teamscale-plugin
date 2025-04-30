@@ -29,4 +29,4 @@ cfgBinder.bindRepositorySetting(
 
 cfgBinder.bindGlobal("/teamscale", "scm-teamscale-plugin.config.link", "teamscaleConfig", TeamscaleGlobalConfiguration);
 
-binder.bind("reviewPlugin.pullrequest.userList", Findings)
+binder.bind("reviewPlugin.pullrequest.userList", Findings);
