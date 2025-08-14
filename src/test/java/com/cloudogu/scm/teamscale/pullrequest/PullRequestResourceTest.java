@@ -1,36 +1,32 @@
 /*
- * MIT License
+ * Copyright (c) 2020 - present Cloudogu GmbH
  *
- * Copyright (c) 2020-present Cloudogu GmbH and Contributors
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
 package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.BranchResolver;
-import com.cloudogu.scm.review.HalRepresentations;
 import com.cloudogu.scm.review.comment.api.CommentResource;
 import com.cloudogu.scm.review.comment.api.CommentRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
 import com.google.common.collect.ImmutableList;
+import de.otto.edison.hal.Embedded;
+import de.otto.edison.hal.HalRepresentation;
+import de.otto.edison.hal.Link;
+import de.otto.edison.hal.Links;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
@@ -50,9 +46,11 @@ import sonia.scm.repository.RepositoryTestData;
 import sonia.scm.web.RestDispatcher;
 import sonia.scm.web.VndMediaType;
 
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -108,22 +106,22 @@ class PullRequestResourceTest {
     when(branchResolver.resolve(REPOSITORY, "source")).thenReturn(Branch.normalBranch("develop", "123456"));
     when(branchResolver.resolve(REPOSITORY, "target")).thenReturn(Branch.normalBranch("master", "987654"));
 
-    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class)))
-      .thenReturn(HalRepresentations.createCollection(
+    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any()))
+      .thenReturn(Response.ok(HalRepresentations.createCollection(
         true,
         "self",
         "create",
         ImmutableList.of(
           createPullRequestDto("1", "source", "target"),
           createPullRequestDto("2", "target", "source")),
-        "pullRequests")
+        "pullRequests")).build()
       );
 
     MockHttpResponse response = new MockHttpResponse();
 
     restDispatcher.invoke(request, response);
 
-    verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class));
+    verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any());
 
     assertThat(response.getContentAsString())
       .contains("\"sourceRevision\":\"987654\",\"targetRevision\":\"123456\"")
@@ -332,5 +330,26 @@ class PullRequestResourceTest {
       assertThat(response.getStatus()).isEqualTo(204);
     }
   }
-}
 
+  static class HalRepresentations {
+
+    private HalRepresentations() {
+    }
+
+    public static HalRepresentation createCollection(
+      boolean permittedToCreate,
+      String selfLink,
+      String createLink,
+      List<? extends HalRepresentation> dtoList, String attributeName
+    ) {
+      Links.Builder builder = Links.linkingTo().self(selfLink);
+
+      if (permittedToCreate) {
+        builder.single(Link.link("create", createLink));
+      }
+
+      return new HalRepresentation(builder.build(), Embedded.embedded(attributeName, dtoList));
+    }
+
+  }
+}

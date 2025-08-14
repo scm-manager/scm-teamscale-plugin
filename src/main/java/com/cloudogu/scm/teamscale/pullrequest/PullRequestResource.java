@@ -1,32 +1,26 @@
 /*
- * MIT License
+ * Copyright (c) 2020 - present Cloudogu GmbH
  *
- * Copyright (c) 2020-present Cloudogu GmbH and Contributors
+ * This program is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see https://www.gnu.org/licenses/.
  */
+
 package com.cloudogu.scm.teamscale.pullrequest;
 
 import com.cloudogu.scm.review.BranchResolver;
 import com.cloudogu.scm.review.comment.api.CommentDto;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
+import com.cloudogu.scm.review.pullrequest.api.PullRequestSortSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
 import com.google.common.base.Strings;
 import de.otto.edison.hal.HalRepresentation;
@@ -44,22 +38,22 @@ import sonia.scm.repository.RepositoryManager;
 import sonia.scm.repository.RepositoryPermissions;
 import sonia.scm.web.VndMediaType;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 
 import static com.cloudogu.scm.teamscale.Constants.READ_FINDINGS_PERMISSION;
 import static com.cloudogu.scm.teamscale.Constants.WRITE_FINDINGS_PERMISSION;
@@ -160,11 +154,21 @@ public class PullRequestResource {
                                               @QueryParam("status") @DefaultValue("OPEN") PullRequestSelector pullRequestSelector) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
 
-    HalRepresentation pullRequests = pullRequestRootResource.getAll(uriInfo, namespace, name, pullRequestSelector);
+    HalRepresentation pullRequests = pullRequestRootResource
+      .getAll(
+        uriInfo,
+        namespace,
+        name,
+        pullRequestSelector,
+        PullRequestSortSelector.ID_ASC)
+      .readEntity(HalRepresentation.class);
 
-    pullRequests.getEmbedded().getItemsBy("pullRequests").forEach(embeddedPr -> {
-      setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr);
-    });
+    pullRequests
+      .getEmbedded()
+      .getItemsBy("pullRequests")
+      .forEach(embeddedPr ->
+        setPullRequestBranchRevisions(repository, (PullRequestDto) embeddedPr)
+      );
 
     return pullRequests;
 
@@ -308,9 +312,9 @@ public class PullRequestResource {
     )
   )
   public Response getFindings(@Context UriInfo uriInfo,
-                                       @PathParam("namespace") String namespace,
-                                       @PathParam("name") String name,
-                                       @PathParam("pullRequestId") String pullRequestId) {
+                              @PathParam("namespace") String namespace,
+                              @PathParam("name") String name,
+                              @PathParam("pullRequestId") String pullRequestId) {
     Repository repository = repositoryManager.get(new NamespaceAndName(namespace, name));
     RepositoryPermissions.custom(READ_FINDINGS_PERMISSION, repository).check();
     return Response.ok(findingsMapper.map(findingsService.getFindings(repository, pullRequestId), repository, pullRequestId)).build();
