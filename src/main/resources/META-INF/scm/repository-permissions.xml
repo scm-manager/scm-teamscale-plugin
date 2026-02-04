@@ -37,7 +37,6 @@
         <verb>writeTeamscaleFindings</verb>
         <verb>readPullRequest</verb>
         <verb>commentPullRequest</verb>
-        <verb>readCIStatus</verb>
         <verb>writeCIStatus</verb>
       </verbs>
     </role>
