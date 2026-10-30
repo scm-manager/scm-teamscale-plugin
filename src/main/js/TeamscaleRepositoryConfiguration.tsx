@@ -18,13 +18,11 @@ import React, { FC } from "react";
 import { useTranslation } from "react-i18next";
 import { Subtitle, Configuration } from "@scm-manager/ui-components";
 import ConfigurationForm from "./TeamscaleRepositoryConfigurationForm";
+import { useRequiredIndexLink} from "@scm-manager/ui-api";
 
-type Props = {
-  link: string;
-};
-
-const TeamscaleRepositoryConfiguration: FC<Props> = ({ link }) => {
+const TeamscaleRepositoryConfiguration: FC = () => {
   const [t] = useTranslation("plugins");
+  const link = useRequiredIndexLink("teamscaleConfig");
 
   return (
     <>

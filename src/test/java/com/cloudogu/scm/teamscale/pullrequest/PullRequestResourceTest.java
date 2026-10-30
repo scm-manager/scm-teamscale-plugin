@@ -21,6 +21,7 @@ import com.cloudogu.scm.review.comment.api.CommentResource;
 import com.cloudogu.scm.review.comment.api.CommentRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestRootResource;
 import com.cloudogu.scm.review.pullrequest.api.PullRequestSelector;
+import com.cloudogu.scm.review.pullrequest.api.PullRequestSortSelector;
 import com.cloudogu.scm.review.pullrequest.dto.PullRequestDto;
 import com.google.common.collect.ImmutableList;
 import de.otto.edison.hal.Embedded;
@@ -54,7 +55,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -106,7 +109,17 @@ class PullRequestResourceTest {
     when(branchResolver.resolve(REPOSITORY, "source")).thenReturn(Branch.normalBranch("develop", "123456"));
     when(branchResolver.resolve(REPOSITORY, "target")).thenReturn(Branch.normalBranch("master", "987654"));
 
-    when(pullRequestRootResource.getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any()))
+    when(pullRequestRootResource.getAll(
+      any(UriInfo.class),
+      anyString(),
+      anyString(),
+      any(PullRequestSelector.class),
+      any(PullRequestSortSelector.class),
+      anyInt(),
+      anyInt(),
+      nullable(String.class),
+      nullable(String.class)
+    ))
       .thenReturn(Response.ok(HalRepresentations.createCollection(
         true,
         "self",
@@ -121,7 +134,7 @@ class PullRequestResourceTest {
 
     restDispatcher.invoke(request, response);
 
-    verify(pullRequestRootResource).getAll(any(UriInfo.class), anyString(), anyString(), any(PullRequestSelector.class), any());
+    verify(pullRequestRootResource).getAll(any(), anyString(), anyString(), any(), any(), anyInt(), anyInt(), any(), any());
 
     assertThat(response.getContentAsString())
       .contains("\"sourceRevision\":\"987654\",\"targetRevision\":\"123456\"")

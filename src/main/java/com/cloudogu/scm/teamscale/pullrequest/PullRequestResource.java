@@ -160,7 +160,12 @@ public class PullRequestResource {
         namespace,
         name,
         pullRequestSelector,
-        PullRequestSortSelector.ID_ASC)
+        PullRequestSortSelector.ID_ASC,
+        0,
+        999,
+        null,
+        null
+        )
       .readEntity(HalRepresentation.class);
 
     pullRequests
